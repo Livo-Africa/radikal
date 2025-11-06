@@ -1,0 +1,442 @@
+@import "tailwindcss";
+
+:root {
+  --primary-black: #000000;
+  --primary-gold: #eef10e;
+  --accent-red: #B91C1C;
+  --clean-white: #FFFFFF;
+  --light-grey: #F5F5F5;
+}
+
+/* Performance Optimizations */
+* {
+  box-sizing: border-box;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  content-visibility: auto;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom animations with performance in mind */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); 
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.6); 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    background-position: -200% 0; 
+  }
+  100% { 
+    background-position: 200% 0; 
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(30px); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    transform: scale(0.9); 
+    opacity: 0; 
+  }
+  to { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+/* Performance-optimized animation classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+  will-change: box-shadow;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  will-change: background-position;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+/* Smooth scroll with fallback */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #eef10e 0%, #B91C1C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Enhanced button styles with performance */
+.btn-premium {
+  @apply relative overflow-hidden bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl;
+  will-change: transform;
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn-premium:hover::before {
+  left: 100%;
+}
+
+/* WhatsApp floating button enhancements */
+@keyframes bounce-glow {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+    box-shadow: 0 0 20px #25D366, 0 0 30px #25D366; 
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.1); 
+    box-shadow: 0 0 30px #25D366, 0 0 50px #25D366; 
+  }
+}
+
+.animate-bounce-glow {
+  animation: bounce-glow 2s ease-in-out infinite;
+  will-change: transform, box-shadow;
+}
+
+/* Card hover effects with GPU acceleration */
+.card-hover {
+  @apply transition-all duration-500 ease-out;
+  will-change: transform;
+}
+
+.card-hover:hover {
+  @apply transform -translate-y-2 shadow-2xl;
+}
+
+/* Gradient borders */
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, #eef10e, #B91C1C);
+  padding: 2px;
+  border-radius: 16px;
+}
+
+.gradient-border > div {
+  background: white;
+  border-radius: 14px;
+  padding: 2rem;
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Focus styles for accessibility */
+.focus-ring:focus {
+  outline: 2px solid #eef10e;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .gradient-text {
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: #000000;
+    font-weight: bold;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-fallback {
+    background-color: #000000;
+    color: #ffffff;
+  }
+}
+
+/* Critical above-the-fold optimizations */
+.above-the-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}
+
+/* Optimize aspect ratios to prevent layout shifts */
+.aspect-optimized {
+  aspect-ratio: 4/5;
+}
+
+/* Lazy loading styles */
+.lazy-load {
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+
+.lazy-load.loaded {
+  opacity: 1;
+}
+
+/* Performance optimized transitions */
+.perf-transition {
+  @apply transition-all duration-300 ease-out;
+  will-change: transform, opacity;
+}
+
+/* Mobile-first responsive helpers */
+.mobile-first-container {
+  @apply container mx-auto px-4;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .hover-effect:hover {
+    transform: none !important;
+  }
+  
+  .card-hover:hover {
+    transform: none !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
+/* Reduced data mode */
+@media (prefers-reduced-data: reduce) {
+  .no-data {
+    display: none;
+  }
+  
+  .animate-float,
+  .animate-glow,
+  .animate-shimmer,
+  .animate-bounce-glow {
+    animation: none;
+  }
+}
+
+/* Screen reader only - for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Optimize font rendering */
+.optimized-text {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+}
+
+/* Prevent FOUC (Flash of Unstyled Content) */
+.no-fouc {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.fouc-ready {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
+/* Critical image loading */
+.critical-image {
+  priority: high;
+  fetchpriority: high;
+}
+
+/* Mobile-optimized testimonial styles */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Touch-friendly improvements */
+@media (max-width: 768px) {
+  .testimonial-card {
+    padding: 1rem;
+  }
+  
+  /* Better touch targets */
+  .filter-tab {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .load-more-btn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Smooth scrolling for mobile filter tabs */
+.filter-container {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.filter-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Performance optimizations */
+.testimonial-image {
+  content-visibility: auto;
+  contain-intrinsic-size: 100px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .testimonial-card {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Add to your existing globals.css */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile scroll snap for testimonials */
+@media (max-width: 768px) {
+  .testimonial-scroll-container {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+  }
+  
+  .testimonial-card {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+}
+
+/* Ensure images don't cause layout shifts */
+.testimonial-image {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* Loading states */
+.skeleton-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Error state styling */
+.testimonial-error {
+  border: 2px dashed #e53e3e;
+  background-color: #fed7d7;
+}
