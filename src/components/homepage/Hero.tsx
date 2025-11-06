@@ -40,7 +40,7 @@ export default function Hero() {
       {backgroundImages.map((image, index) => (
         <div
           key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+          className={`absolute inset-0 transition-opacity duration-10000 ease-in-out ${
             index === currentImage ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
@@ -53,7 +53,7 @@ export default function Hero() {
       ))}
       
       {/* DARKER Overlay - Increased from 60% to 70% darkness */}
-      <div className="absolute inset-0 bg-black/70"></div>
+      <div className="absolute inset-0 bg-black/85"></div>
       
       {/* Optional: Additional Gradient Overlay for Better Text Readability */}
       <div 
@@ -104,21 +104,7 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Trust Indicators */}
-        <div className="mt-12 flex justify-center items-center space-x-8 text-white/80 text-sm">
-          <div className="flex items-center">
-            <span className="text-[#D4AF37] mr-2">⭐</span>
-            Premium Quality
-          </div>
-          <div className="flex items-center">
-            <span className="text-[#D4AF37] mr-2">⚡</span>
-            Fast Delivery
-          </div>
-          <div className="flex items-center">
-            <span className="text-[#D4AF37] mr-2">💬</span>
-            24/7 Support
-          </div>
-        </div>
+       
       </div>
 
       {/* Image Navigation Dots */}

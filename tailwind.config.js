@@ -16,7 +16,7 @@ module.exports = {
         'light-grey': '#F5F5F5',
       },
       fontFamily: {
-  playfair: ['var(--font-playfair)', 'serif'], // CHANGE THIS LINE
+  playfair: ['var(--font-playfair)', 'serif'], 
 },
       animation: {
         'float': 'float 3s ease-in-out infinite',

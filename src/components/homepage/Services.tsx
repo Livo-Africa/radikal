@@ -30,7 +30,7 @@ export default function Services() {
     <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-4 font-playfair">Our Creative Services</h2>
-        <p className="text-xl text-center mb-12 text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-center mb-12 text-[#D4AF37]-600 max-w-2xl mx-auto">
           Premium creative solutions powered by cutting-edge technology
         </p>
         

@@ -3,7 +3,7 @@ export default function AudienceSplit() {
     {
       title: "FOR INDIVIDUALS",
       description: "Virtual Photoshoot Studio",
-      features: ["Professional Headshots", "Social Media Content", "Graduation Photos", "Personal Branding"],
+      features: ["Studio Photoshoot", "Birthday Shoot", "Graduation Photos", "Professional Headshot"],
       buttonText: "Start Photoshoot",
       link: "/individuals",
       bgGradient: "from-[#D4AF37]/5 to-[#D4AF37]/10",

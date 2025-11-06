@@ -86,7 +86,7 @@ export default function Transformations({ transformations = [] }: { transformati
           <h2 className="text-4xl font-bold text-center mb-4 font-playfair">
             The Radikal Transformation
           </h2>
-          <p className="text-xl text-center mb-12 text-[#B91C1C]">
+          <p className="text-xl text-center mb-12 text-[#D4AF37]">
             From ordinary to extraordinary across all services
           </p>
           <div className="text-center">
