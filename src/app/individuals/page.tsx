@@ -1,4 +1,4 @@
-// src/app/individuals/page.tsx
+// src/app/individuals/page.tsx - UPDATED
 import Navigation from '@/components/shared/Navigation';
 import Footer from '@/components/shared/Footer';
 import WhatsAppFloat from '@/components/shared/WhatsAppFloat';
@@ -6,11 +6,44 @@ import HeroSection from '@/components/individuals/HeroSection';
 import PackageShowcase from '@/components/individuals/PackageShowcase';
 import ProcessSection from '@/components/individuals/ProcessSection';
 import TransformationsGallery from '@/components/individuals/TransformationsGallery';
-import AddOnsMarketplace from '@/components/individuals/AddOnsMarketplace';
 import FAQSection from '@/components/individuals/FAQSection';
 import FinalCTA from '@/components/individuals/FinalCTA';
+import { getTransformations } from '@/lib/google-sheets';
 
-export default function IndividualsPage() {
+// Mock transformations in case Google Sheets fails
+const mockTransformations = [
+  {
+    beforeUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=600&fit=crop",
+    afterUrl: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=500&h=600&fit=crop",
+    visible: true
+  },
+  {
+    beforeUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=600&fit=crop", 
+    afterUrl: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=500&h=600&fit=crop",
+    visible: true
+  },
+  {
+    beforeUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&h=600&fit=crop",
+    afterUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&h=600&fit=crop",
+    visible: true
+  }
+];
+
+async function fetchTransformations() {
+  try {
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+      const transformations = await getTransformations();
+      return transformations && transformations.length > 0 ? transformations : mockTransformations;
+    }
+    return mockTransformations;
+  } catch (error) {
+    return mockTransformations;
+  }
+}
+
+export default async function IndividualsPage() {
+  const transformations = await fetchTransformations();
+
   return (
     <>
       <Navigation />
@@ -18,8 +51,7 @@ export default function IndividualsPage() {
         <HeroSection />
         <PackageShowcase />
         <ProcessSection />
-        <TransformationsGallery />
-        <AddOnsMarketplace />
+        <TransformationsGallery transformations={transformations} />
         <FAQSection />
         <FinalCTA />
       </main>

@@ -39,10 +39,7 @@ export default function HeroSection() {
             className="w-full h-full object-cover opacity-70"
           />
           <div className="absolute inset-0 bg-black/50"></div>
-          <div className="absolute bottom-8 left-8 bg-black/80 text-white px-4 py-2 rounded-lg font-bold text-lg">
-            BEFORE
-          </div>
-        </div>
+
         
         {/* After side */}
         <div className="flex-1 relative">
@@ -52,9 +49,7 @@ export default function HeroSection() {
             className="w-full h-full object-cover opacity-70"
           />
           <div className="absolute inset-0 bg-black/50"></div>
-          <div className="absolute bottom-8 right-8 bg-[#D4AF37] text-black px-4 py-2 rounded-lg font-bold text-lg">
-            AFTER
-          </div>
+          
         </div>
       </div>
 
