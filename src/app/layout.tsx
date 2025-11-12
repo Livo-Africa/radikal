@@ -1,16 +1,15 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { inter, playfair } from './fonts';
 import './globals.css';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
-import { inter, playfair } from './fonts'; // ADD THIS LINE
-
 
 export const metadata: Metadata = {
   title: 'Radikal Creative Technologies',
   description: 'Class • Technology • Future - Transforming Visions into Visual Reality',
   keywords: 'photography, graphic design, video production, creative technology, Ghana',
-  authors: [{ name: 'Radikal Creative Technologies' }],
+  authors: [{ name: 'Radikal Creative Technologies' },
+    {name: 'Kelvin Quaicoo' }
+  ],
   openGraph: {
     title: 'Radikal Creative Technologies',
     description: 'Class • Technology • Future - Transforming Visions into Visual Reality',
@@ -25,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}> {/* CHANGE THIS LINE */}
+    <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
       <body className={`${inter.className} antialiased bg-white text-black overflow-x-hidden`}>
         <ErrorBoundary>
           <div className="min-h-screen flex flex-col pt-16">

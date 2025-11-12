@@ -21,7 +21,7 @@ export default function Services() {
     {
       title: "Advanced Solutions",
       items: ["Virtual Try-Ons", "AI Model Displays", "Creative Direction"],
-      icon: "🚀",
+      icon: "⚙️",
       gradient: "from-orange-500 to-red-500"
     }
   ];

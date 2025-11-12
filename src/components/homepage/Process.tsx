@@ -33,7 +33,7 @@ export default function Process() {
       step: 1,
       title: 'Consult',
       description: 'Understand your goals',
-      icon: '🎯',
+      icon: '📱',
       details: 'Deep dive into your brand needs'
     },
     {
@@ -54,7 +54,7 @@ export default function Process() {
       step: 4,
       title: 'Deliver',
       description: 'Ready to use',
-      icon: '🚀',
+      icon: '⚡️',
       details: 'Premium results delivered fast'
     }
   ];

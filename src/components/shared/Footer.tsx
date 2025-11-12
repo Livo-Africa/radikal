@@ -59,7 +59,7 @@ export default function Footer() {
                 radikalcreatech@gmail.com
               </a>
               <div className="text-gray-400 text-sm">
-                Based in Ghana • Serving Worldwide
+                The future is Radikal 
               </div>
             </div>
           </div>
