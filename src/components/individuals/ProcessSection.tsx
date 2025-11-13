@@ -1,4 +1,3 @@
-// src/components/individuals/ProcessSection.tsx - FIXED (Horizontal scroll on mobile)
 export default function ProcessSection() {
   const processSteps = [
     {
