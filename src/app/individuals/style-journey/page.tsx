@@ -6,7 +6,8 @@ import Footer from '@/components/shared/Footer';
 import WhatsAppFloat from '@/components/shared/WhatsAppFloat';
 import Step1ShootType from '@/components/style-journey/Step1ShootType';
 import Step2Package from '@/components/style-journey/Step2Package';
-import Step3PhotoUpload from '@/components/style-journey/Step3PhotoUpload'; // ADD THIS IMPORT
+import Step3PhotoUpload from '@/components/style-journey/Step3PhotoUpload';
+import Step4OutfitSelection from '@/components/style-journey/Step4OutfitSelection'; // ADD THIS IMPORT
 import StepNavigation from '@/components/style-journey/StepNavigation';
 
 export default function StyleJourney() {
@@ -27,7 +28,8 @@ export default function StyleJourney() {
   const steps = [
     { number: 1, title: 'Shoot Type', component: Step1ShootType },
     { number: 2, title: 'Package', component: Step2Package },
-    { number: 3, title: 'Photos', component: Step3PhotoUpload }, // ADD THIS STEP
+    { number: 3, title: 'Photos', component: Step3PhotoUpload },
+    { number: 4, title: 'Outfits', component: Step4OutfitSelection }, // ADD THIS STEP
     // We'll add other steps later
   ];
 
