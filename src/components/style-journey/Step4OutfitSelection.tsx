@@ -40,6 +40,10 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
     { id: '8', name: 'Creative Artistic', category: 'Creative', image: '🎨', tags: ['creative', 'artistic', 'unique'] },
   ];
 
+  // FIXED: Use Array.from instead of spread operator with Set
+  const categories = ['All', ...Array.from(new Set(wardrobeOutfits.map(o => o.category)))];
+
+  // ... rest of the component remains EXACTLY the same ...
   // Check if we can proceed
   useEffect(() => {
     const canProceed = 
@@ -138,8 +142,6 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
   const filteredOutfits = activeFilter === 'All' 
     ? wardrobeOutfits 
     : wardrobeOutfits.filter(outfit => outfit.category === activeFilter);
-
-  const categories = ['All', ...new Set(wardrobeOutfits.map(o => o.category))];
 
   return (
     <div 
