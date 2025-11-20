@@ -65,7 +65,11 @@ export default function Step7Payment({ formData, setFormData, currentStep, setCu
           customer: formData.whatsappNumber,
           package: formData.package?.name,
           amount: formData.finalTotal,
-          urgent: formData.addOns?.includes('rush-delivery')
+          urgent: formData.addOns?.includes('rush-delivery'),
+          shootType: formData.shootTypeName,
+      outfitsCount: formData.outfits?.length || 0,
+      specialRequests: formData.specialRequests,
+      images: formData.uploadedImages ? Object.values(formData.uploadedImages) : []
         })
       });
 

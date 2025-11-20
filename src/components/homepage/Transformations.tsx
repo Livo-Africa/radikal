@@ -1,16 +1,20 @@
+// src/components/homepage/Transformations.tsx - FIXED
 'use client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { Eye, EyeOff, ArrowRight, Play, Pause, Sparkles } from 'lucide-react';
 
 export default function Transformations({ transformations = [] }: { transformations?: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeFilter, setActiveFilter] = useState('All');
   const [showAfter, setShowAfter] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [componentKey, setComponentKey] = useState(0);
-  const pathname = usePathname();
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const pathname = usePathname(); // ✅ ADDED THIS LINE
 
-  // Safe mount detection - only runs on client
+  // Safe mount detection
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -18,13 +22,19 @@ export default function Transformations({ transformations = [] }: { transformati
   // Safe route change detection
   useEffect(() => {
     if (isMounted && pathname === '/') {
-      setComponentKey(prev => prev + 1);
       setShowAfter(false);
       setCurrentIndex(0);
+      setIsPlaying(true);
     }
   }, [pathname, isMounted]);
 
-  const filters = ['All', 'Personal', 'Product', 'Brand', 'Video'];
+  const filters = [
+    { id: 'All', name: 'All Work', icon: Sparkles },
+    { id: 'Personal', name: 'Personal', icon: Eye },
+    { id: 'Product', name: 'Product', icon: Sparkles },
+    { id: 'Brand', name: 'Brand', icon: Sparkles },
+    { id: 'Video', name: 'Video', icon: Play }
+  ];
 
   const filteredTransformations = activeFilter === 'All' 
     ? transformations 
@@ -44,9 +54,9 @@ export default function Transformations({ transformations = [] }: { transformati
         }
       }).filter(t => t.beforeUrl && t.afterUrl);
 
-  // Auto-advance - only when mounted
+  // Auto-advance with play/pause control
   useEffect(() => {
-    if (!isMounted || filteredTransformations.length === 0) return;
+    if (!isMounted || filteredTransformations.length === 0 || !isPlaying) return;
     
     const interval = setInterval(() => {
       setShowAfter(prev => {
@@ -60,14 +70,42 @@ export default function Transformations({ transformations = [] }: { transformati
     }, 4000);
     
     return () => clearInterval(interval);
-  }, [filteredTransformations.length, showAfter, isMounted]);
+  }, [filteredTransformations.length, showAfter, isMounted, isPlaying]);
 
   // Reset when filter changes
   useEffect(() => {
     if (!isMounted) return;
     setShowAfter(false);
     setCurrentIndex(0);
+    setIsPlaying(true);
   }, [activeFilter, isMounted]);
+
+  // Touch swipe handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) {
+      // Swipe left - next transformation
+      setCurrentIndex((prev) => (prev + 1) % filteredTransformations.length);
+      setShowAfter(false);
+    } else if (isRightSwipe) {
+      // Swipe right - previous transformation
+      setCurrentIndex((prev) => (prev - 1 + filteredTransformations.length) % filteredTransformations.length);
+      setShowAfter(false);
+    }
+  };
 
   const handleToggleView = () => {
     setShowAfter(!showAfter);
@@ -78,19 +116,26 @@ export default function Transformations({ transformations = [] }: { transformati
     setShowAfter(false);
   };
 
-  // Show loading state during SSR and before hydration
+  const togglePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  // Show loading state during SSR
   if (!isMounted) {
     return (
-      <section className="py-20 bg-black text-white">
+      <section className="py-12 md:py-20 bg-black text-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-4 font-playfair">
-            The Radikal Transformation
-          </h2>
-          <p className="text-xl text-center mb-12 text-[#D4AF37]">
-            From ordinary to extraordinary across all services
-          </p>
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 font-playfair">
+              The Radikal <span className="text-[#D4AF37]">Transformation</span>
+            </h2>
+            <p className="text-lg md:text-xl text-[#D4AF37] max-w-2xl mx-auto">
+              From ordinary to extraordinary across all services
+            </p>
+          </div>
           <div className="text-center">
-            <p className="text-[#D4AF37]">Loading transformations...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D4AF37] mx-auto"></div>
+            <p className="text-[#D4AF37] mt-4">Loading transformations...</p>
           </div>
         </div>
       </section>
@@ -99,10 +144,14 @@ export default function Transformations({ transformations = [] }: { transformati
 
   if (!transformations || transformations.length === 0) {
     return (
-      <section className="py-20 bg-black text-white">
+      <section className="py-12 md:py-20 bg-black text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4 font-playfair">The Radikal Transformation</h2>
-          <p className="text-xl text-[#B91C1C] mb-8">No transformations available yet.</p>
+          <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 font-playfair">
+            The Radikal <span className="text-[#D4AF37]">Transformation</span>
+          </h2>
+          <p className="text-lg md:text-xl text-[#B91C1C] mb-6 md:mb-8">
+            No transformations available yet.
+          </p>
         </div>
       </section>
     );
@@ -111,47 +160,56 @@ export default function Transformations({ transformations = [] }: { transformati
   const currentTransform = filteredTransformations[currentIndex];
 
   return (
-    <section className="py-20 bg-black text-white">
+    <section className="py-12 md:py-20 bg-black text-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-4 font-playfair">
-          The Radikal Transformation
-        </h2>
-        <p className="text-xl text-center mb-12 text-[#B91C1C]">
-          From ordinary to extraordinary across all services
-        </p>
+        {/* Enhanced Header */}
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 font-playfair">
+            The Radikal <span className="text-[#D4AF37]">Transformation</span>
+          </h2>
+          <p className="text-lg md:text-xl text-[#D4AF37] max-w-2xl mx-auto">
+            From ordinary to extraordinary across all services
+          </p>
+        </div>
 
-        {/* Filter Tabs */}
-        <div className="flex justify-center mb-12 flex-wrap gap-2">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => {
-                setActiveFilter(filter);
-                setCurrentIndex(0);
-                setShowAfter(false);
-              }}
-              className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 text-sm md:text-base md:px-6 md:py-3 ${
-                activeFilter === filter
-                  ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/30'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
+        {/* Enhanced Filter Tabs - Mobile Scrollable */}
+        <div className="flex justify-start md:justify-center mb-8 md:mb-12 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex space-x-2 md:space-x-4 px-4 md:px-0 min-w-max">
+            {filters.map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => {
+                  setActiveFilter(filter.id);
+                  setCurrentIndex(0);
+                  setShowAfter(false);
+                  setIsPlaying(true);
+                }}
+                className={`flex items-center space-x-2 px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
+                  activeFilter === filter.id
+                    ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/30'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`}
+              >
+                <filter.icon className="w-4 h-4" />
+                <span className="text-sm md:text-base">{filter.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Empty State */}
         {filteredTransformations.length === 0 && (
-          <div className="text-center py-12 max-w-2xl mx-auto">
-            <div className="bg-gray-900/50 backdrop-blur-sm p-8 rounded-3xl border border-gray-800">
-              <h3 className="text-2xl font-bold mb-4 text-[#D4AF37]">No Transformations Found</h3>
-              <p className="text-gray-300 mb-6">
+          <div className="text-center py-8 md:py-12 max-w-2xl mx-auto">
+            <div className="bg-gray-900/50 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-800">
+              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-[#D4AF37]">
+                No Transformations Found
+              </h3>
+              <p className="text-gray-300 mb-4 md:mb-6 text-sm md:text-base">
                 No transformations available for "{activeFilter}" category.
               </p>
               <button 
                 onClick={() => setActiveFilter('All')}
-                className="bg-[#D4AF37] hover:bg-[#b8941f] text-black px-6 py-3 rounded-lg font-semibold transition-colors"
+                className="bg-[#D4AF37] hover:bg-[#b8941f] text-black px-6 py-3 rounded-lg font-semibold transition-colors text-sm md:text-base"
               >
                 Show All Transformations
               </button>
@@ -162,8 +220,14 @@ export default function Transformations({ transformations = [] }: { transformati
         {/* Transformation Display */}
         {filteredTransformations.length > 0 && currentTransform && (
           <div className="max-w-4xl mx-auto">
-            {/* Image Container - Safe key without Date.now() */}
-            <div key={`transform-${currentIndex}-${showAfter}-${componentKey}`} className="relative aspect-[3/4] md:aspect-[4/5] rounded-3xl overflow-hidden border-4 border-gray-700 shadow-2xl mb-8">
+            {/* Image Container with Touch Support */}
+            <div 
+              className="relative aspect-[3/4] md:aspect-[4/5] rounded-2xl md:rounded-3xl overflow-hidden border-2 md:border-4 border-gray-700 shadow-2xl mb-6 md:mb-8 cursor-pointer"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onClick={handleToggleView}
+            >
               {/* Before Image */}
               <div className={`absolute inset-0 transition-opacity duration-500 ${
                 showAfter ? 'opacity-0' : 'opacity-100'
@@ -172,12 +236,12 @@ export default function Transformations({ transformations = [] }: { transformati
                   src={currentTransform.beforeUrl} 
                   alt="Before transformation"
                   className="w-full h-full object-cover"
-                  loading="eager"
+                  loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = 'https://via.placeholder.com/800x1000/333/fff?text=Before+Image+Not+Found';
                   }}
                 />
-                <div className="absolute bottom-4 left-4 bg-black/80 text-white px-4 py-2 rounded-lg font-semibold">
+                <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4 bg-black/80 text-white px-3 md:px-4 py-1 md:py-2 rounded-lg font-semibold text-sm md:text-base">
                   BEFORE
                 </div>
               </div>
@@ -190,40 +254,97 @@ export default function Transformations({ transformations = [] }: { transformati
                   src={currentTransform.afterUrl} 
                   alt="After transformation"
                   className="w-full h-full object-cover"
-                  loading="eager"
+                  loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = 'https://via.placeholder.com/800x1000/666/fff?text=After+Image+Not+Found';
                   }}
                 />
-                <div className="absolute bottom-4 left-4 bg-[#D4AF37] text-black px-4 py-2 rounded-lg font-semibold">
+                <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4 bg-[#D4AF37] text-black px-3 md:px-4 py-1 md:py-2 rounded-lg font-semibold text-sm md:text-base">
                   AFTER
                 </div>
               </div>
+
+              {/* Play/Pause Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlayPause();
+                }}
+                className="absolute top-3 md:top-4 right-3 md:right-4 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm"
+              >
+                {isPlaying ? (
+                  <Pause className="w-4 h-4 md:w-5 md:h-5" />
+                ) : (
+                  <Play className="w-4 h-4 md:w-5 md:h-5" />
+                )}
+              </button>
+
+              {/* Swipe Hint - Mobile Only */}
+              <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-black/60 text-white px-2 py-1 rounded text-xs md:hidden backdrop-blur-sm">
+                ← Swipe →
+              </div>
             </div>
 
-            {/* Manual Toggle Button */}
-            <div className="text-center mb-8">
+            {/* Enhanced Controls */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-6 md:mb-8">
+              {/* Manual Toggle Button */}
               <button
                 onClick={handleToggleView}
-                className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors border border-gray-600"
+                className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors border border-gray-600 w-full md:w-auto justify-center"
               >
-                {showAfter ? 'Show Before' : 'Show After'}
+                {showAfter ? (
+                  <>
+                    <EyeOff className="w-4 h-4" />
+                    <span>Show Before</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4" />
+                    <span>Show After</span>
+                  </>
+                )}
               </button>
+
+              {/* Navigation Dots - Enhanced */}
+              <div className="flex space-x-2 md:space-x-3 order-first md:order-none">
+                {filteredTransformations.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleNavigation(index)}
+                    className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
+                      index === currentIndex 
+                        ? 'bg-[#D4AF37] scale-125 shadow-lg shadow-[#D4AF37]/50' 
+                        : 'bg-gray-600 hover:bg-gray-400 hover:scale-110'
+                    }`}
+                    aria-label={`Go to transformation ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
-           
+            {/* Transformation Info - Enhanced */}
+            <div className="text-center bg-gray-900/50 backdrop-blur-sm p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-800 hover:border-gray-600 transition-all duration-500 mb-6 md:mb-8">
+              <h4 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">
+                {currentTransform.title}
+              </h4>
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm md:text-base">
+                <span className="bg-[#D4AF37] text-black px-3 py-1 md:px-4 md:py-2 rounded-full font-semibold">
+                  {currentTransform.service}
+                </span>
+                <span className="bg-[#B91C1C] text-white px-3 py-1 md:px-4 md:py-2 rounded-full font-semibold">
+                  {currentTransform.metrics}
+                </span>
+              </div>
+            </div>
 
-            {/* Navigation & Actions */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              {/* Navigation Dots */}
-             
-
-              {/* View More Button */}
+            {/* Enhanced View More Button */}
+            <div className="text-center">
               <a 
                 href="/transformations"
-                className="bg-transparent hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black px-6 py-3 rounded-lg font-semibold transition-colors border border-[#D4AF37]"
+                className="inline-flex items-center space-x-2 bg-transparent hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black px-6 py-3 rounded-lg font-semibold transition-colors border border-[#D4AF37] text-sm md:text-base"
               >
-                View More Work →
+                <span>View More Work</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
           </div>

@@ -1,7 +1,9 @@
 // components/style-journey/Step4OutfitSelection.tsx
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAbandonmentTracking } from '@/hooks/useAbandonmentTracking';
+import { saveProgressToStorage } from '@/lib/session';
 
 interface Step4OutfitSelectionProps {
   formData: any;
@@ -23,29 +25,35 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
   const [selectedOutfits, setSelectedOutfits] = useState<Outfit[]>([]);
   const [outfitDescription, setOutfitDescription] = useState('');
   const [showNextButton, setShowNextButton] = useState(false);
-  const [showWardrobeModal, setShowWardrobeModal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { trackAbandonment, hasPhoneNumber } = useAbandonmentTracking(formData, currentStep);
+  const router = useRouter();
 
   // Get outfit slots based on package
   const outfitSlots = formData.package?.outfits || 2;
 
-  // Sample wardrobe data
-  const wardrobeOutfits: Outfit[] = [
-    { id: '1', name: 'Navy Business Suit', category: 'Professional', image: '👔', tags: ['formal', 'business', 'professional'] },
-    { id: '2', name: 'Grey Executive Suit', category: 'Professional', image: '👔', tags: ['formal', 'executive', 'professional'] },
-    { id: '3', name: 'Black Formal Suit', category: 'Professional', image: '👔', tags: ['formal', 'elegant', 'professional'] },
-    { id: '4', name: 'Casual Blazer', category: 'Casual', image: '🧥', tags: ['casual', 'smart-casual', 'modern'] },
-    { id: '5', name: 'Designer Dress', category: 'Formal', image: '👗', tags: ['elegant', 'formal', 'dress'] },
-    { id: '6', name: 'Trendy Streetwear', category: 'Casual', image: '👕', tags: ['casual', 'trendy', 'urban'] },
-    { id: '7', name: 'Traditional Kente', category: 'Cultural', image: '🎗️', tags: ['cultural', 'traditional', 'colorful'] },
-    { id: '8', name: 'Creative Artistic', category: 'Creative', image: '🎨', tags: ['creative', 'artistic', 'unique'] },
-  ];
+  // Load any previously selected outfits from localStorage (from wardrobe)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('radikal_selected_outfits');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.outfits && Array.isArray(parsed.outfits)) {
+            setSelectedOutfits(parsed.outfits);
+            
+            // If we have outfits from wardrobe, automatically select 'browse' option
+            if (parsed.outfits.length > 0) {
+              setSelectedOption('browse');
+            }
+          }
+        } catch (error) {
+          console.error('Error loading saved outfits:', error);
+        }
+      }
+    }
+  }, []);
 
-  // FIXED: Use Array.from instead of spread operator with Set
-  const categories = ['All', ...Array.from(new Set(wardrobeOutfits.map(o => o.category)))];
-
-  // ... rest of the component remains EXACTLY the same ...
   // Check if we can proceed
   useEffect(() => {
     const canProceed = 
@@ -62,7 +70,9 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
     setSelectedOption(option);
     
     if (option === 'browse') {
-      setShowWardrobeModal(true);
+      // Save progress and navigate to wardrobe
+      saveProgressToStorage(formData, currentStep);
+      router.push(`/wardrobe?returnToStep=4&slots=${outfitSlots}`);
     } else if (option === 'auto') {
       // Auto-select outfits based on shoot type
       const autoSelected = getAutoSelectedOutfits();
@@ -71,6 +81,12 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
     } else if (option === 'skip') {
       setFormData((prev: any) => ({ ...prev, skipOutfits: true }));
     }
+  };
+
+  // Navigate to wardrobe (for adding more outfits)
+  const handleBrowseWardrobe = () => {
+    saveProgressToStorage(formData, currentStep);
+    router.push(`/wardrobe?returnToStep=4&slots=${outfitSlots}`);
   };
 
   // Auto-select outfits based on shoot type
@@ -86,24 +102,43 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
       default: category = 'Professional';
     }
     
+    // Sample wardrobe data for auto-selection
+    const wardrobeOutfits: Outfit[] = [
+      { id: '1', name: 'Navy Business Suit', category: 'Professional', image: '👔', tags: ['formal', 'business', 'professional'] },
+      { id: '2', name: 'Grey Executive Suit', category: 'Professional', image: '👔', tags: ['formal', 'executive', 'professional'] },
+      { id: '3', name: 'Black Formal Suit', category: 'Professional', image: '👔', tags: ['formal', 'elegant', 'professional'] },
+      { id: '4', name: 'Casual Blazer', category: 'Casual', image: '🧥', tags: ['casual', 'smart-casual', 'modern'] },
+      { id: '5', name: 'Designer Dress', category: 'Formal', image: '👗', tags: ['elegant', 'formal', 'dress'] },
+      { id: '6', name: 'Trendy Streetwear', category: 'Casual', image: '👕', tags: ['casual', 'trendy', 'urban'] },
+      { id: '7', name: 'Traditional Kente', category: 'Cultural', image: '🎗️', tags: ['cultural', 'traditional', 'colorful'] },
+      { id: '8', name: 'Creative Artistic', category: 'Creative', image: '🎨', tags: ['creative', 'artistic', 'unique'] },
+    ];
+    
     return wardrobeOutfits
       .filter(outfit => outfit.category === category)
       .slice(0, outfitSlots);
   };
 
-  // Wardrobe selection handlers
-  const handleSelectOutfit = (outfit: Outfit) => {
-    if (selectedOutfits.find(o => o.id === outfit.id)) {
-      // Remove if already selected
-      setSelectedOutfits(prev => prev.filter(o => o.id !== outfit.id));
-    } else if (selectedOutfits.length < outfitSlots) {
-      // Add if within slot limit
-      setSelectedOutfits(prev => [...prev, outfit]);
+  // Remove single outfit
+  const handleRemoveOutfit = (outfitId: string) => {
+    const updated = selectedOutfits.filter(o => o.id !== outfitId);
+    setSelectedOutfits(updated);
+    
+    // Update localStorage
+    if (updated.length === 0) {
+      localStorage.removeItem('radikal_selected_outfits');
+    } else {
+      localStorage.setItem('radikal_selected_outfits', JSON.stringify({
+        outfits: updated,
+        selectedAt: new Date().toISOString()
+      }));
     }
   };
 
-  const handleRemoveOutfit = (outfitId: string) => {
-    setSelectedOutfits(prev => prev.filter(o => o.id !== outfitId));
+  // Clear all selections
+  const handleClearAll = () => {
+    setSelectedOutfits([]);
+    localStorage.removeItem('radikal_selected_outfits');
   };
 
   const handleContinue = () => {
@@ -117,6 +152,9 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
       outfitOption: selectedOption
     }));
     
+    // Clear temporary wardrobe storage
+    localStorage.removeItem('radikal_selected_outfits');
+    
     // Smooth transition
     if (containerRef.current) {
       containerRef.current.style.opacity = '0.9';
@@ -128,27 +166,24 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
     }, 200);
   };
 
- const handleBack = () => {
-  // Track abandonment if user has provided phone number
-  if (hasPhoneNumber) {
-    trackAbandonment('navigated_back_from_step_4');
-  }
-  
-  if (containerRef.current) {
-    containerRef.current.style.opacity = '0.9';
-    containerRef.current.style.transform = 'scale(0.98)';
-  }
-  
-  setTimeout(() => {
-    setCurrentStep(3);
-  }, 200);
-};
-
-  // Filter outfits by category
-  const [activeFilter, setActiveFilter] = useState('All');
-  const filteredOutfits = activeFilter === 'All' 
-    ? wardrobeOutfits 
-    : wardrobeOutfits.filter(outfit => outfit.category === activeFilter);
+  const handleBack = () => {
+    // Track abandonment if user has provided phone number
+    if (hasPhoneNumber) {
+      trackAbandonment('navigated_back_from_step_4');
+    }
+    
+    // Clear temporary wardrobe storage when going back
+    localStorage.removeItem('radikal_selected_outfits');
+    
+    if (containerRef.current) {
+      containerRef.current.style.opacity = '0.9';
+      containerRef.current.style.transform = 'scale(0.98)';
+    }
+    
+    setTimeout(() => {
+      setCurrentStep(3);
+    }, 200);
+  };
 
   return (
     <div 
@@ -181,7 +216,7 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
         <div 
           onClick={() => handleSelectOption('browse')}
           className={`
-            bg-white rounded-2xl p-6 border-2 cursor-pointer transition-all duration-300 transform
+            group relative bg-white rounded-2xl p-6 border-2 cursor-pointer transition-all duration-300 transform
             ${selectedOption === 'browse' 
               ? 'border-[#D4AF37] bg-gradient-to-br from-[#D4AF37]/10 to-transparent scale-105 shadow-2xl' 
               : 'border-gray-200 hover:border-[#D4AF37]/50 hover:scale-102 hover:shadow-xl'
@@ -189,17 +224,25 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
           `}
         >
           <div className="text-center">
-            <div className="text-5xl mb-4">👔</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Browse Our Wardrobe</h3>
+            <div className="text-5xl mb-4">👗</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Browse Virtual Wardrobe</h3>
             <p className="text-gray-600 mb-4">
-              Choose from 200+ professional outfits curated by our stylists
+              Choose from 200+ professional outfits in our digital wardrobe
             </p>
-            <div className="flex justify-center space-x-2 text-sm text-gray-500">
-              <span>👔 Professional</span>
-              <span>👗 Formal</span>
-              <span>👕 Casual</span>
+            <div className="flex justify-center space-x-2 text-sm text-gray-500 mb-2">
+              <span>📱 Real Images</span>
+              <span>🔍 Search & Filter</span>
+              <span>🎯 Context-Aware</span>
+            </div>
+            <div className="text-[#D4AF37] font-semibold">
+              Select {outfitSlots} outfit{outfitSlots > 1 ? 's' : ''} ↗
             </div>
           </div>
+          
+          {/* Glow effect for selected */}
+          {selectedOption === 'browse' && (
+            <div className="absolute inset-0 rounded-2xl bg-[#D4AF37] opacity-10 blur-xl -z-10 animate-pulse"></div>
+          )}
         </div>
 
         {/* Option 2: Describe Style */}
@@ -245,9 +288,9 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
               Our expert stylists will choose perfect outfits for your photoshoot
             </p>
             <div className="flex justify-center space-x-2 text-sm text-gray-500">
-              <span>🤖 AI-Powered</span>
               <span>⭐ Expert Curated</span>
               <span>🚀 Fast</span>
+              <span>✨ Surprise Me</span>
             </div>
           </div>
         </div>
@@ -272,7 +315,7 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
             <div className="flex justify-center space-x-2 text-sm text-gray-500">
               <span>🎯 Trust Experts</span>
               <span>⚡ Save Time</span>
-              <span>✨ Surprise Me</span>
+              <span>🤝 We'll Guide You</span>
             </div>
           </div>
         </div>
@@ -297,12 +340,22 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
         </div>
       )}
 
+      {/* Wardrobe Selection Summary */}
       {selectedOption === 'browse' && selectedOutfits.length > 0 && (
         <div className="max-w-2xl mx-auto bg-white rounded-2xl p-6 border-2 border-[#D4AF37] shadow-lg">
-          <h3 className="text-xl font-bold text-center mb-4">
-            ✅ Your Selected Outfits ({selectedOutfits.length}/{outfitSlots})
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-900">
+              ✅ Outfits Selected ({selectedOutfits.length}/{outfitSlots})
+            </h3>
+            <button
+              onClick={handleClearAll}
+              className="text-red-500 hover:text-red-700 text-sm font-semibold"
+            >
+              Clear All
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             {selectedOutfits.map((outfit) => (
               <div key={outfit.id} className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
                 <div className="flex items-center space-x-3">
@@ -321,16 +374,34 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
               </div>
             ))}
           </div>
+          
           {selectedOutfits.length < outfitSlots && (
-            <div className="text-center mt-4">
+            <div className="text-center">
               <button
-                onClick={() => setShowWardrobeModal(true)}
-                className="text-[#D4AF37] hover:text-[#b8941f] font-semibold"
+                onClick={handleBrowseWardrobe}
+                className="text-[#D4AF37] hover:text-[#b8941f] font-semibold flex items-center justify-center space-x-2"
               >
-                + Add more outfits
+                <span>+ Add more outfits</span>
+                <span>↗</span>
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {selectedOption === 'browse' && selectedOutfits.length === 0 && (
+        <div className="max-w-2xl mx-auto bg-yellow-50 rounded-2xl p-6 border-2 border-yellow-200 text-center">
+          <div className="text-4xl mb-4">👗</div>
+          <h3 className="text-xl font-bold text-yellow-800 mb-2">Ready to Browse Outfits?</h3>
+          <p className="text-yellow-700 mb-4">
+            You haven't selected any outfits yet. Visit our virtual wardrobe to choose {outfitSlots} outfit{outfitSlots > 1 ? 's' : ''} for your photoshoot.
+          </p>
+          <button
+            onClick={handleBrowseWardrobe}
+            className="bg-[#D4AF37] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#b8941f] transition-colors"
+          >
+            Open Virtual Wardrobe ↗
+          </button>
         </div>
       )}
 
@@ -338,9 +409,14 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
         <div className="max-w-2xl mx-auto bg-green-50 rounded-2xl p-6 border-2 border-green-200 text-center">
           <div className="text-4xl mb-4">✨</div>
           <h3 className="text-xl font-bold text-green-800 mb-2">Perfect Outfits Selected!</h3>
-          <p className="text-green-700">
+          <p className="text-green-700 mb-4">
             Based on your {formData.shootTypeName} photoshoot, we've automatically selected {outfitSlots} outfits that will look amazing on you.
           </p>
+          <div className="flex justify-center space-x-2 text-sm text-green-600">
+            <span>✅ Professionally Curated</span>
+            <span>✅ Style-Matched</span>
+            <span>✅ Perfect Fit Guaranteed</span>
+          </div>
         </div>
       )}
 
@@ -348,141 +424,13 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
         <div className="max-w-2xl mx-auto bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 text-center">
           <div className="text-4xl mb-4">🎯</div>
           <h3 className="text-xl font-bold text-blue-800 mb-2">We've Got You Covered!</h3>
-          <p className="text-blue-700">
+          <p className="text-blue-700 mb-4">
             Our expert stylists will choose the perfect outfits for your {formData.shootTypeName} photoshoot. Just focus on looking great!
           </p>
-        </div>
-      )}
-
-      {/* Virtual Wardrobe Modal */}
-      {showWardrobeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] text-white p-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Virtual Wardrobe</h2>
-                <button
-                  onClick={() => setShowWardrobeModal(false)}
-                  className="text-white hover:text-gray-200 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-              <p className="mt-2 opacity-90">
-                Select {outfitSlots} outfit{outfitSlots > 1 ? 's' : ''} for your photoshoot
-              </p>
-              
-              {/* Selected Outfits */}
-              {selectedOutfits.length > 0 && (
-                <div className="mt-4">
-                  <div className="text-sm font-semibold mb-2">Selected ({selectedOutfits.length}/{outfitSlots}):</div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedOutfits.map(outfit => (
-                      <div key={outfit.id} className="bg-white/20 rounded-full px-3 py-1 text-sm flex items-center space-x-2">
-                        <span>{outfit.image}</span>
-                        <span>{outfit.name}</span>
-                        <button 
-                          onClick={() => handleRemoveOutfit(outfit.id)}
-                          className="text-white hover:text-gray-200"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 max-h-[60vh] overflow-y-auto">
-              {/* Filters */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {categories.map(category => (
-                  <button
-                    key={category}
-                    onClick={() => setActiveFilter(category)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                      activeFilter === category
-                        ? 'bg-[#D4AF37] text-black'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-
-              {/* Outfits Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredOutfits.map(outfit => {
-                  const isSelected = selectedOutfits.find(o => o.id === outfit.id);
-                  
-                  return (
-                    <div
-                      key={outfit.id}
-                      onClick={() => handleSelectOutfit(outfit)}
-                      className={`
-                        border-2 rounded-xl p-4 cursor-pointer transition-all duration-300
-                        ${isSelected
-                          ? 'border-[#D4AF37] bg-gradient-to-br from-[#D4AF37]/10 to-transparent transform scale-105'
-                          : 'border-gray-200 hover:border-[#D4AF37]/50 hover:scale-102'
-                        }
-                        ${selectedOutfits.length >= outfitSlots && !isSelected ? 'opacity-50 pointer-events-none' : ''}
-                      `}
-                    >
-                      <div className="text-center">
-                        <div className="text-4xl mb-3">{outfit.image}</div>
-                        <h3 className="font-bold text-gray-900 mb-1">{outfit.name}</h3>
-                        <div className="text-sm text-gray-500 mb-3">{outfit.category}</div>
-                        <div className="flex flex-wrap gap-1 justify-center mb-3">
-                          {outfit.tags.slice(0, 2).map(tag => (
-                            <span key={tag} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                        <button
-                          className={`
-                            w-full py-2 rounded-lg text-sm font-semibold transition-all
-                            ${isSelected
-                              ? 'bg-[#D4AF37] text-black'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }
-                          `}
-                        >
-                          {isSelected ? 'Selected ✓' : 'Select Outfit'}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="border-t border-gray-200 p-6 bg-gray-50">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600">
-                  {selectedOutfits.length} of {outfitSlots} outfits selected
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => setShowWardrobeModal(false)}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => setShowWardrobeModal(false)}
-                    className="px-6 py-2 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#b8941f] transition-colors"
-                  >
-                    Done Selecting
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div className="flex justify-center space-x-2 text-sm text-blue-600">
+            <span>🤝 Expert Guidance</span>
+            <span>⚡ Time Saved</span>
+            <span>✨ Surprise Element</span>
           </div>
         </div>
       )}
@@ -524,6 +472,15 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
           </button>
         )}
       </div>
+
+      {/* Progress Helper */}
+      {selectedOption === 'browse' && selectedOutfits.length > 0 && selectedOutfits.length < outfitSlots && (
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-20 text-center">
+          <div className="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-semibold animate-pulse">
+            🎯 Select {outfitSlots - selectedOutfits.length} more outfit{outfitSlots - selectedOutfits.length > 1 ? 's' : ''} to continue
+          </div>
+        </div>
+      )}
     </div>
   );
 }

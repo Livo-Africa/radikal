@@ -120,3 +120,56 @@ export async function getTransformations() {
     return [];
   }
 }
+
+
+// ADD NEW OUTFITS FUNCTION
+export async function getOutfits(category?: string, search?: string) {
+  const sheets = initializeSheets();
+  
+  try {
+    console.log('Fetching outfits from sheet...');
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      range: 'Outfits!A:F', // ID, Name, Category, Image_URL, Tags, Available
+    });
+
+    const rows = response.data.values;
+    console.log('Raw outfits data:', rows);
+
+    if (!rows || rows.length === 0) {
+      console.log('No outfits data found');
+      return [];
+    }
+
+    // Process outfit data - same pattern as existing functions
+    let outfits = rows.slice(1).map((row) => ({
+      id: row[0] || '',
+      name: row[1] || '',
+      category: row[2] || '',
+      imageUrl: row[3] || '',
+      tags: (row[4] || '').split(',').map(tag => tag.trim()),
+      available: (row[5] || '').toString().toUpperCase() === 'TRUE',
+    })).filter(item => item.available && item.id);
+
+    // Apply filters if provided
+    if (category && category !== 'All') {
+      outfits = outfits.filter(item => item.category === category);
+    }
+
+    if (search) {
+      const searchLower = search.toLowerCase();
+      outfits = outfits.filter(item => 
+        item.name.toLowerCase().includes(searchLower) ||
+        item.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      );
+    }
+
+    console.log('Processed outfits:', outfits);
+    return outfits;
+  } catch (error) {
+    console.error('Error fetching outfits:', error);
+    
+    // Return empty array instead of mock data for production safety
+    return [];
+      }
+}
