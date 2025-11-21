@@ -10,8 +10,8 @@ export default function Hero() {
   // Mobile-optimized content
   const subheadings = [
     "Studio photos without the studio",
-    "Professional headshots in 1-3 hours", 
-    "AI-powered photography reimagined"
+    "Premium Visuals at Revolutionary Speed", 
+    "Your Creative Partner in the Digital Age"
   ];
 
   const backgroundImages = [
@@ -61,10 +61,10 @@ export default function Hero() {
           
           {/* Headline - Mobile First */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-light text-white mb-4 md:mb-6 tracking-tight leading-tight">
-            Professional
+            Advanced Creative
             <br />
             <span className="bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] bg-clip-text text-transparent font-semibold">
-              Headshots
+              Solutions
             </span>
           </h1>
           
@@ -80,14 +80,14 @@ export default function Hero() {
             {/* Primary CTA - Full width on mobile */}
             <button className="w-full sm:w-auto group bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-2xl flex items-center justify-center space-x-2">
               <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
-              <span>Start Free Trial</span>
+              <span>Start Photoshoot</span>
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
             </button>
             
             {/* Secondary CTA - Less prominent on mobile */}
             <button className="w-full sm:w-auto group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg transition-all duration-300 transform hover:scale-105 border border-white/30 hover:border-white/50 flex items-center justify-center space-x-2">
               <Play className="w-4 h-4 md:w-5 md:h-5" />
-              <span>View Demo</span>
+              <span>Explore Business Solutions</span>
             </button>
           </div>
 

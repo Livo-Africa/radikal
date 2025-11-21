@@ -1,4 +1,4 @@
-// src/components/shared/Navigation.tsx - PROFESSIONAL REDESIGN
+// src/components/shared/Navigation.tsx - GLASS MORPHISM DESIGN
 'use client';
 import { useState, useEffect } from 'react';
 import { ChevronDown, Sparkles, Building2, Users, Camera, Menu, X } from 'lucide-react';
@@ -7,12 +7,16 @@ export default function Navigation() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
 
-  // Scroll effect for background change
+  // Enhanced scroll detection
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const scrollY = window.scrollY;
+      setScrolled(scrollY > 50);
+      setIsAtTop(scrollY < 10);
     };
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -92,47 +96,84 @@ export default function Navigation() {
     ]
   };
 
+  // Glass morphism styles based on scroll state
+  const getNavStyles = () => {
+    if (isAtTop) {
+      // At very top - subtle glass on dark hero background
+      return {
+        background: 'rgba(255, 255, 255, 0.08)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        textColor: 'text-white',
+        shadow: 'none'
+      };
+    } else if (scrolled) {
+      // Scrolled - stronger glass on white background
+      return {
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        textColor: 'text-gray-900',
+        shadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+      };
+    } else {
+      // Minimal scroll - medium glass
+      return {
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(15px)',
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        textColor: 'text-gray-900',
+        shadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+      };
+    }
+  };
+
+  const navStyles = getNavStyles();
+
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-lg' 
-          : 'bg-transparent'
-      }`}>
+      <nav 
+        className="fixed top-0 w-full z-50 transition-all duration-500 ease-out"
+        style={{
+          background: navStyles.background,
+          backdropFilter: navStyles.backdropFilter,
+          borderBottom: navStyles.border,
+          boxShadow: navStyles.shadow
+        }}
+      >
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-4">
-            {/* Enhanced Logo with Professional Typography */}
+          <div className="flex justify-between items-center py-3">
+            {/* Enhanced Logo with Glass Effect */}
             <a href="/" className="flex items-center space-x-3 group">
-              <div className="w-8 h-8 bg-gradient-to-br from-[#D4AF37] to-[#B91C1C] rounded-lg flex items-center justify-center shadow-lg">
+              <div 
+                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 4px 20px rgba(212, 175, 55, 0.3)'
+                }}
+              >
                 <span className="text-white font-bold text-sm">R</span>
               </div>
               <div className="flex flex-col">
-                <span className={`font-bold text-lg tracking-tight transition-colors ${
-                  scrolled ? 'text-gray-900' : 'text-white'
-                } group-hover:text-[#D4AF37]`}>
+                <span className={`font-bold text-lg tracking-tight transition-colors duration-300 ${navStyles.textColor} group-hover:text-[#D4AF37]`}>
                   RADIKAL
                 </span>
-                <span className={`text-xs transition-colors ${
-                  scrolled ? 'text-gray-600' : 'text-white/80'
-                } group-hover:text-[#D4AF37]`}>
+                <span className={`text-xs transition-colors duration-300 ${isAtTop ? 'text-white/70' : 'text-gray-600'} group-hover:text-[#D4AF37]`}>
                   Creative Technologies
                 </span>
               </div>
             </a>
 
-            {/* Desktop Navigation - Professional Layout */}
-            <div className="hidden lg:flex items-center space-x-8">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-6">
               {/* Individuals Dropdown */}
               <div 
                 className="relative"
                 onMouseEnter={() => setActiveDropdown('individuals')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <button className={`flex items-center space-x-1 transition-all duration-200 ${
-                  scrolled 
-                    ? 'text-gray-700 hover:text-gray-900' 
-                    : 'text-white/90 hover:text-white'
-                } font-medium text-sm`}>
+                <button className={`flex items-center space-x-1 transition-all duration-200 font-medium text-sm ${navStyles.textColor} hover:text-[#D4AF37]`}>
                   <span>Individuals</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
                     activeDropdown === 'individuals' ? 'rotate-180' : ''
@@ -140,8 +181,16 @@ export default function Navigation() {
                 </button>
                 
                 {activeDropdown === 'individuals' && (
-                  <div className="absolute top-full left-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-3 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
+                  <div 
+                    className="absolute top-full left-0 mt-2 w-80 rounded-2xl py-3 z-50"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+                    }}
+                  >
+                    <div className="px-4 py-2 border-b border-gray-100/50">
                       <h3 className="font-semibold text-gray-900 text-sm">For Individuals</h3>
                       <p className="text-gray-500 text-xs">Professional photography for personal use</p>
                     </div>
@@ -174,11 +223,7 @@ export default function Navigation() {
                 onMouseEnter={() => setActiveDropdown('business')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <button className={`flex items-center space-x-1 transition-all duration-200 ${
-                  scrolled 
-                    ? 'text-gray-700 hover:text-gray-900' 
-                    : 'text-white/90 hover:text-white'
-                } font-medium text-sm`}>
+                <button className={`flex items-center space-x-1 transition-all duration-200 font-medium text-sm ${navStyles.textColor} hover:text-[#D4AF37]`}>
                   <span>Business</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
                     activeDropdown === 'business' ? 'rotate-180' : ''
@@ -186,8 +231,16 @@ export default function Navigation() {
                 </button>
                 
                 {activeDropdown === 'business' && (
-                  <div className="absolute top-full left-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-3 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
+                  <div 
+                    className="absolute top-full left-0 mt-2 w-80 rounded-2xl py-3 z-50"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+                    }}
+                  >
+                    <div className="px-4 py-2 border-b border-gray-100/50">
                       <h3 className="font-semibold text-gray-900 text-sm">For Business</h3>
                       <p className="text-gray-500 text-xs">Enterprise-grade visual solutions</p>
                     </div>
@@ -220,11 +273,7 @@ export default function Navigation() {
                 onMouseEnter={() => setActiveDropdown('creators')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <button className={`flex items-center space-x-1 transition-all duration-200 ${
-                  scrolled 
-                    ? 'text-gray-700 hover:text-gray-900' 
-                    : 'text-white/90 hover:text-white'
-                } font-medium text-sm`}>
+                <button className={`flex items-center space-x-1 transition-all duration-200 font-medium text-sm ${navStyles.textColor} hover:text-[#D4AF37]`}>
                   <span>Creators</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
                     activeDropdown === 'creators' ? 'rotate-180' : ''
@@ -232,8 +281,16 @@ export default function Navigation() {
                 </button>
                 
                 {activeDropdown === 'creators' && (
-                  <div className="absolute top-full left-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-3 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
+                  <div 
+                    className="absolute top-full left-0 mt-2 w-80 rounded-2xl py-3 z-50"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+                    }}
+                  >
+                    <div className="px-4 py-2 border-b border-gray-100/50">
                       <h3 className="font-semibold text-gray-900 text-sm">For Creators</h3>
                       <p className="text-gray-500 text-xs">Partnership and white-label services</p>
                     </div>
@@ -261,43 +318,36 @@ export default function Navigation() {
               </div>
 
               {/* Simple Links */}
-              <a 
-                href="/services" 
-                className={`transition-all duration-200 font-medium text-sm ${
-                  scrolled 
-                    ? 'text-gray-700 hover:text-gray-900' 
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Services
-              </a>
-              <a 
-                href="/about" 
-                className={`transition-all duration-200 font-medium text-sm ${
-                  scrolled 
-                    ? 'text-gray-700 hover:text-gray-900' 
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                About
-              </a>
-              <a 
-                href="/contact" 
-                className={`transition-all duration-200 font-medium text-sm ${
-                  scrolled 
-                    ? 'text-gray-700 hover:text-gray-900' 
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Contact
-              </a>
+              {['Services', 'About', 'Contact'].map((item) => (
+                <a 
+                  key={item}
+                  href={`/${item.toLowerCase()}`}
+                  className={`transition-all duration-200 font-medium text-sm ${navStyles.textColor} hover:text-[#D4AF37]`}
+                >
+                  {item}
+                </a>
+              ))}
             </div>
 
-            {/* CTA Button - Professional Style */}
+            {/* CTA Button with Glass Effect */}
             <div className="hidden lg:flex items-center">
               <a 
                 href="/start" 
-                className="bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold px-6 py-2.5 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm"
+                className="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 transform hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 4px 20px rgba(212, 175, 55, 0.4)',
+                  color: 'white'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212, 175, 55, 1) 0%, rgba(185, 28, 28, 1) 100%)';
+                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(212, 175, 55, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(212, 175, 55, 0.4)';
+                }}
               >
                 Start Project
               </a>
@@ -306,9 +356,7 @@ export default function Navigation() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden p-2 transition-colors ${
-                scrolled ? 'text-gray-700' : 'text-white'
-              }`}
+              className={`lg:hidden p-2 transition-colors ${navStyles.textColor}`}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -316,58 +364,89 @@ export default function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
-      <div className={`lg:hidden fixed inset-0 z-40 bg-black/95 backdrop-blur-xl transition-all duration-300 ease-in-out ${
-        mobileMenuOpen 
-          ? 'opacity-100 visible' 
-          : 'opacity-0 invisible pointer-events-none'
-      }`} style={{ top: '76px' }}>
-        <div className="flex flex-col h-full px-6 py-8 overflow-y-auto">
-          {/* Mobile Navigation Items */}
-          <div className="space-y-4">
-            {Object.entries(dropdowns).map(([category, items]) => (
-              <div key={category} className="border-b border-gray-700 pb-4">
-                <h3 className="text-[#D4AF37] font-semibold text-sm uppercase tracking-wide mb-3">
-                  {category}
-                </h3>
-                <div className="space-y-2">
-                  {items.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center space-x-3 text-white hover:text-[#D4AF37] transition-colors py-2 px-3 rounded-lg hover:bg-white/5"
-                    >
-                      <item.icon className="w-4 h-4" />
-                      <span className="text-sm">{item.name}</span>
-                    </a>
-                  ))}
+      {/* Mobile Menu Overlay - Enhanced Glass Morphism */}
+      <div 
+        className={`lg:hidden fixed inset-0 z-40 transition-all duration-500 ease-out ${
+          mobileMenuOpen 
+            ? 'opacity-100 visible' 
+            : 'opacity-0 invisible pointer-events-none'
+        }`} 
+        style={{ top: '72px' }}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(8px)'
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        
+        {/* Mobile Menu Content */}
+        <div 
+          className="relative h-full max-h-[calc(100vh-72px)] overflow-y-auto"
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.2)'
+          }}
+        >
+          <div className="flex flex-col px-6 py-8">
+            {/* Mobile Navigation Items */}
+            <div className="space-y-6">
+              {Object.entries(dropdowns).map(([category, items]) => (
+                <div key={category} className="border-b border-gray-200/50 pb-6">
+                  <h3 className="text-[#D4AF37] font-semibold text-sm uppercase tracking-wide mb-4">
+                    {category}
+                  </h3>
+                  <div className="space-y-3">
+                    {items.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center space-x-3 text-gray-900 hover:text-[#D4AF37] transition-colors py-3 px-4 rounded-xl hover:bg-white/50"
+                      >
+                        <div className="w-8 h-8 bg-gradient-to-br from-[#D4AF37]/10 to-[#B91C1C]/10 rounded-lg flex items-center justify-center">
+                          <item.icon className="w-4 h-4 text-[#D4AF37]" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{item.name}</div>
+                          <div className="text-gray-500 text-xs">{item.description}</div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-            
-            {/* Simple Links */}
-            {['Services', 'About', 'Contact'].map((item) => (
-              <a
-                key={item}
-                href={`/${item.toLowerCase()}`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-white hover:text-[#D4AF37] transition-colors py-3 px-3 rounded-lg hover:bg-white/5 text-sm font-medium"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
+              ))}
+              
+              {/* Simple Links */}
+              {['Services', 'About', 'Contact'].map((item) => (
+                <a
+                  key={item}
+                  href={`/${item.toLowerCase()}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-gray-900 hover:text-[#D4AF37] transition-colors py-4 px-4 rounded-xl hover:bg-white/50 text-sm font-medium border-b border-gray-200/50"
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
 
-          {/* Mobile CTA */}
-          <div className="mt-8 pt-6 border-t border-gray-700">
-            <a
-              href="/start"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block w-full bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 px-4 rounded-lg text-center transition-colors text-sm"
-            >
-              Start Your Project
-            </a>
+            {/* Mobile CTA */}
+            <div className="mt-8 pt-6 border-t border-gray-200/50">
+              <a
+                href="/start"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] text-white font-semibold py-4 px-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 text-sm"
+                style={{
+                  boxShadow: '0 4px 20px rgba(212, 175, 55, 0.4)'
+                }}
+              >
+                Start Your Project
+              </a>
+            </div>
           </div>
         </div>
       </div>

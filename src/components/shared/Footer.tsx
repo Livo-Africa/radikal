@@ -17,10 +17,6 @@ export default function Footer() {
             <p className="text-gray-400 text-sm mb-4 leading-relaxed">
               Transforming visions into visual reality with premium creative technology.
             </p>
-            <div className="flex items-center text-gray-400 text-sm">
-              <MapPin className="w-4 h-4 mr-2" />
-              <span>Based in Ghana • Serving Worldwide</span>
-            </div>
           </div>
 
           {/* Quick Links */}
