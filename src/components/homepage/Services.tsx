@@ -117,12 +117,10 @@ export default function Services() {
               Our team can create tailored packages for your specific needs and budget.
             </p>
             <a
-              href="https://wa.me/233207472307?text=Hi%20Radikal,%20I%20want%20a%20custom%20quote%20for%20my%20service"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto"
+              href="/contact"
+              className="bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto group"
             >
-              <span>Get Custom Quote</span>
+              <span>Get Custom Pricing</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
 

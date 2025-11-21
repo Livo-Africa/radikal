@@ -147,7 +147,7 @@ export default function FinalCTA() {
             href="/contact"
             className="inline-block bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 border border-white/30 text-sm"
           >
-            Get Custom Quote
+            Get Custom pricing
           </a>
         </div>
       </div>

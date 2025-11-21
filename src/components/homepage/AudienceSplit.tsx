@@ -50,7 +50,7 @@ export default function AudienceSplit() {
             Solutions for <span className="text-[#D4AF37]">Everyone</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
-            Tailored photography solutions for individuals, businesses, and creators
+            Tailored solutions for individuals, businesses, and creators
           </p>
         </div>
 
