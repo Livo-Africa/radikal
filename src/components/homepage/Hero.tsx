@@ -6,6 +6,7 @@ import { ArrowRight, Camera, Building, Zap, Star, Users } from 'lucide-react';
 interface Symbol {
   id: number;
   svg: string;
+  name: string;
   x: number;
   y: number;
   scale: number;
@@ -18,7 +19,7 @@ export default function Hero() {
   const [currentSubheading, setCurrentSubheading] = useState(0);
   const [symbols, setSymbols] = useState<Symbol[]>([]);
   const symbolCount = useRef(0);
-  const maxSymbols = 8; // Maximum symbols on screen at once
+  const maxSymbols = 6; // Reduced for better performance
   
   const subheadings = [
     "Studio photos without the studio",
@@ -26,58 +27,68 @@ export default function Hero() {
     "Your Creative Partner in the Digital Age"
   ];
 
-  // SVG symbols data
+  // Properly formatted SVG symbols
   const symbolTemplates = [
     {
       name: "Gye Nyame",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 744 1052" fill="currentColor">
-        <path d="M372 0C166 0 0 166 0 372s166 372 372 372 372-166 372-372S578 0 372 0z"/>
-      </svg>`
-    },
-    {
-      name: "Adinkrahene",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 744 1052" fill="currentColor">
-        <circle cx="372" cy="526" r="300" stroke="currentColor" fill="none" stroke-width="20"/>
-        <circle cx="372" cy="526" r="150" stroke="currentColor" fill="none" stroke-width="20"/>
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M 50,5 A 45,45 0 0 1 95,50 A 45,45 0 0 1 50,95 A 45,45 0 0 1 5,50 A 45,45 0 0 1 50,5 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+        <circle cx="50" cy="50" r="15" stroke="currentColor" stroke-width="2" fill="none"/>
       </svg>`
     },
     {
       name: "Sankofa",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 744 1052" fill="currentColor">
-        <path d="M372 100c-150 0-272 122-272 272s122 272 272 272 272-122 272-272S522 100 372 100z"/>
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 50,10 C 30,10 20,35 30,50 C 40,65 70,65 80,50 C 85,42 85,30 75,25 L 65,35 C 70,38 70,42 68,45 C 65,50 45,50 42,42 C 40,38 45,25 50,25 C 60,25 65,40 60,45 C 58,48 55,48 53,47 L 50,70 L 70,50 L 53,47 Z" fill="currentColor"/>
       </svg>`
     },
     {
-      name: "Nsibidi Autonym",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 244 186" fill="currentColor">
-        <path d="M20 150 L120 30 L220 150 Z" stroke="currentColor" fill="none" stroke-width="8"/>
+      name: "Dwennimmen",
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30,30 C 10,50 10,70 30,85 C 50,70 50,50 30,30 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+        <path d="M 70,30 C 90,50 90,70 70,85 C 50,70 50,50 70,30 Z" stroke="currentColor" stroke-width="3" fill="none"/>
       </svg>`
     },
     {
-      name: "Cowrie",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor">
-        <path d="M20,50 Q50,10 80,50 Q50,90 20,50 Z" stroke="currentColor" fill="none" stroke-width="3"/>
-        <path d="M35,45 Q50,35 65,45" stroke="currentColor" fill="none" stroke-width="2"/>
+      name: "Nsibidi Love",
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30,50 C 25,35 40,25 50,30 C 60,25 75,35 70,50 C 68,60 60,68 50,70 C 40,68 32,60 30,50 Z" fill="none" stroke="currentColor" stroke-width="3"/>
+        <path d="M 50,30 L 50,70" stroke="currentColor" stroke-width="3"/>
       </svg>`
     },
     {
-      name: "Nsibidi Three Letters",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 617 487" fill="currentColor">
-        <path d="M100 200 L200 100 L300 200 Z" stroke="currentColor" fill="none" stroke-width="8"/>
+      name: "Nsibidi Unity",
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="3"/>
+        <circle cx="70" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="3"/>
+        <path d="M 50,30 L 50,70" stroke="currentColor" stroke-width="3"/>
+        <path d="M 20,50 L 80,50" stroke="currentColor" stroke-width="3"/>
       </svg>`
     },
     {
       name: "Yin Yang",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
-        <path d="M256 0a256 256 0 100 512 256 256 0 000-512zm0 128a128 128 0 010 256 128 128 0 010-256z"/>
-        <circle cx="256" cy="160" r="32" fill="white"/>
-        <circle cx="256" cy="352" r="32" fill="black"/>
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M 50,5 a 45,45 0 1 1 0,90 a 22.5,22.5 0 1 1 0,-90 a 22.5,22.5 0 1 0 0,90 Z" fill="currentColor"/>
+        <circle cx="50" cy="27.5" r="7" fill="white"/>
+        <circle cx="50" cy="72.5" r="7" fill="black"/>
+      </svg>`
+    },
+    {
+      name: "Cowrie Shell",
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30,20 C 20,40 20,60 30,80 C 50,95 70,95 80,80 C 90,60 90,40 80,20 C 70,5 50,5 30,20 Z" fill="white" stroke="currentColor" stroke-width="2"/>
+        <path d="M 40,25 L 40,75" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M 50,22 L 50,78" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M 60,25 L 60,75" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M 30,20 C 50,35 70,35 80,20" stroke="currentColor" stroke-width="1" fill="none"/>
       </svg>`
     },
     {
       name: "Infinity",
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" fill="currentColor">
-        <path d="M10 25c0-8 6-15 15-15s15 7 25 15-10 15-25 15-15-7-15-15zM50 25c10-8 15-15 25-15s15 7 15 15-6 15-15 15-15-7-25-15z" fill="none" stroke="currentColor" stroke-width="3"/>
+      svg: `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30,50 C 20,65 40,80 55,70 C 65,65 65,50 55,45 C 50,40 40,40 35,45 C 30,50 25,65 35,75 C 45,85 65,75 70,60" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
       </svg>`
     }
   ];
@@ -95,12 +106,13 @@ export default function Hero() {
     return {
       id: symbolCount.current++,
       svg: template.svg,
+      name: template.name,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      scale: 0.3 + Math.random() * 0.7,
+      scale: 0.4 + Math.random() * 0.6, // Reduced scale range
       rotation: Math.random() * 360,
-      delay: Math.random() * 2000,
-      duration: 8000 + Math.random() * 7000
+      delay: Math.random() * 1000,
+      duration: 6000 + Math.random() * 4000
     };
   };
 
@@ -110,7 +122,7 @@ export default function Hero() {
     }, 3000);
 
     // Initial symbols
-    const initialSymbols = Array.from({ length: 4 }, createSymbol);
+    const initialSymbols = Array.from({ length: 3 }, createSymbol);
     setSymbols(initialSymbols);
 
     // Add new symbols periodically
@@ -121,7 +133,7 @@ export default function Hero() {
         }
         return [...current, createSymbol()];
       });
-    }, 2000);
+    }, 1500); // Faster symbol generation
 
     return () => {
       clearInterval(subheadingInterval);
@@ -144,12 +156,18 @@ export default function Hero() {
                 left: `${symbol.x}%`,
                 top: `${symbol.y}%`,
                 transform: `scale(${symbol.scale}) rotate(${symbol.rotation}deg)`,
-                animation: `symbolFloat ${symbol.duration}ms ease-in-out ${symbol.delay}ms infinite`,
+                animation: `symbolFirework ${symbol.duration}ms ease-out ${symbol.delay}ms both`,
                 color: color,
-                opacity: 0.1 + Math.random() * 0.15
+                opacity: 0.15 + Math.random() * 0.2,
+                width: '60px',
+                height: '60px'
               }}
-              dangerouslySetInnerHTML={{ __html: symbol.svg }}
-            />
+            >
+              <div 
+                dangerouslySetInnerHTML={{ __html: symbol.svg }}
+                className="w-full h-full"
+              />
+            </div>
           );
         })}
 
@@ -233,30 +251,26 @@ export default function Hero() {
       </div>
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
-        @keyframes symbolFloat {
+      <style jsx global>{`
+        @keyframes symbolFirework {
           0% {
             transform: translateY(100vh) scale(0) rotate(0deg);
             opacity: 0;
           }
-          10% {
-            transform: translateY(80vh) scale(0.5) rotate(90deg);
-            opacity: 0.3;
-          }
-          30% {
-            transform: translateY(60vh) scale(0.8) rotate(180deg);
+          20% {
+            transform: translateY(70vh) scale(0.8) rotate(90deg);
             opacity: 0.4;
           }
-          50% {
-            transform: translateY(40vh) scale(1) rotate(270deg);
+          40% {
+            transform: translateY(40vh) scale(1) rotate(180deg);
             opacity: 0.3;
           }
-          70% {
-            transform: translateY(20vh) scale(0.8) rotate(360deg);
+          60% {
+            transform: translateY(20vh) scale(0.9) rotate(270deg);
             opacity: 0.2;
           }
           100% {
-            transform: translateY(-100px) scale(0) rotate(450deg);
+            transform: translateY(-100px) scale(0) rotate(360deg);
             opacity: 0;
           }
         }
