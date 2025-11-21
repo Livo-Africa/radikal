@@ -13,13 +13,15 @@ interface Symbol {
   rotation: number;
   delay: number;
   duration: number;
+  animationType: 'float' | 'spin' | 'pulse' | 'drift' | 'arc';
+  direction: 'up' | 'down' | 'left' | 'right';
 }
 
 export default function Hero() {
   const [currentSubheading, setCurrentSubheading] = useState(0);
   const [symbols, setSymbols] = useState<Symbol[]>([]);
   const symbolCount = useRef(0);
-  const maxSymbols = 6; // Reduced for better performance
+  const maxSymbols = 15; // Increased but with better distribution
   
   const subheadings = [
     "Studio photos without the studio",
@@ -98,21 +100,54 @@ export default function Hero() {
     '#F4D03F', // Yellow
     '#FFFFFF', // White
     '#E8C872', // Light Gold
-    '#F7DC6F'  // Pale Yellow
+    '#F7DC6F', // Pale Yellow
+    '#FFD700', // Bright Gold
   ];
+
+  const animationTypes: ('float' | 'spin' | 'pulse' | 'drift' | 'arc')[] = ['float', 'spin', 'pulse', 'drift', 'arc'];
+  const directions: ('up' | 'down' | 'left' | 'right')[] = ['up', 'down', 'left', 'right'];
 
   const createSymbol = (): Symbol => {
     const template = symbolTemplates[Math.floor(Math.random() * symbolTemplates.length)];
+    const animationType = animationTypes[Math.floor(Math.random() * animationTypes.length)];
+    const direction = directions[Math.floor(Math.random() * directions.length)];
+    
+    // Different starting positions based on direction
+    let x, y;
+    switch(direction) {
+      case 'up': 
+        x = Math.random() * 100;
+        y = 100 + Math.random() * 20;
+        break;
+      case 'down':
+        x = Math.random() * 100;
+        y = -20 - Math.random() * 20;
+        break;
+      case 'left':
+        x = 100 + Math.random() * 20;
+        y = Math.random() * 100;
+        break;
+      case 'right':
+        x = -20 - Math.random() * 20;
+        y = Math.random() * 100;
+        break;
+      default:
+        x = Math.random() * 100;
+        y = 100 + Math.random() * 20;
+    }
+
     return {
       id: symbolCount.current++,
       svg: template.svg,
       name: template.name,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      scale: 0.4 + Math.random() * 0.6, // Reduced scale range
+      x,
+      y,
+      scale: 0.3 + Math.random() * 0.5, // Smaller scale for less clutter
       rotation: Math.random() * 360,
-      delay: Math.random() * 1000,
-      duration: 6000 + Math.random() * 4000
+      delay: Math.random() * 500, // Shorter delay
+      duration: 8000 + Math.random() * 7000,
+      animationType,
+      direction
     };
   };
 
@@ -121,25 +156,38 @@ export default function Hero() {
       setCurrentSubheading((prev) => (prev + 1) % subheadings.length);
     }, 3000);
 
-    // Initial symbols
-    const initialSymbols = Array.from({ length: 3 }, createSymbol);
+    // Initial symbols - start with more but spread out timing
+    const initialSymbols = Array.from({ length: 8 }, createSymbol);
     setSymbols(initialSymbols);
 
-    // Add new symbols periodically
+    // Add new symbols more frequently but in smaller batches
     const symbolInterval = setInterval(() => {
       setSymbols(current => {
-        if (current.length >= maxSymbols) {
-          return current.slice(1);
+        // Remove 1-2 old symbols when adding new ones to maintain balance
+        const toRemove = current.length >= maxSymbols ? Math.floor(Math.random() * 2) + 1 : 0;
+        const newSymbols = [...current.slice(toRemove)];
+        
+        // Add 1-2 new symbols
+        const toAdd = Math.floor(Math.random() * 2) + 1;
+        for (let i = 0; i < toAdd; i++) {
+          if (newSymbols.length < maxSymbols) {
+            newSymbols.push(createSymbol());
+          }
         }
-        return [...current, createSymbol()];
+        
+        return newSymbols;
       });
-    }, 1500); // Faster symbol generation
+    }, 800); // Faster but smaller batches
 
     return () => {
       clearInterval(subheadingInterval);
       clearInterval(symbolInterval);
     };
   }, []);
+
+  const getAnimationName = (symbol: Symbol) => {
+    return `${symbol.animationType}-${symbol.direction}`;
+  };
 
   return (
     <section className="pt-16 min-h-[90vh] md:min-h-[100vh] flex items-center justify-center relative overflow-hidden bg-black">
@@ -148,6 +196,8 @@ export default function Hero() {
         {/* Floating Cultural Symbols */}
         {symbols.map((symbol) => {
           const color = colors[Math.floor(Math.random() * colors.length)];
+          const size = 30 + Math.random() * 40; // Varied sizes
+          
           return (
             <div
               key={symbol.id}
@@ -156,11 +206,12 @@ export default function Hero() {
                 left: `${symbol.x}%`,
                 top: `${symbol.y}%`,
                 transform: `scale(${symbol.scale}) rotate(${symbol.rotation}deg)`,
-                animation: `symbolFirework ${symbol.duration}ms ease-out ${symbol.delay}ms both`,
+                animation: `${getAnimationName(symbol)} ${symbol.duration}ms ease-in-out ${symbol.delay}ms infinite`,
                 color: color,
-                opacity: 0.15 + Math.random() * 0.2,
-                width: '60px',
-                height: '60px'
+                opacity: 0.08 + Math.random() * 0.12, // Lower opacity for less clutter
+                width: `${size}px`,
+                height: `${size}px`,
+                filter: 'blur(0.5px)'
               }}
             >
               <div 
@@ -171,14 +222,16 @@ export default function Hero() {
           );
         })}
 
-        {/* Animated Gradient Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-[#D4AF37]/20 to-[#F4D03F]/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-[#F4D03F]/10 to-[#D4AF37]/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2000ms'}}></div>
+        {/* Subtle Gradient Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-[#D4AF37]/10 to-[#F4D03F]/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-[#F4D03F]/5 to-[#D4AF37]/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2000ms'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-gradient-to-r from-[#FFFFFF]/5 to-[#E8C872]/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4000ms'}}></div>
         
         {/* Geometric Patterns */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-3">
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-shimmer"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#F4D03F] to-transparent animate-shimmer" style={{animationDelay: '1000ms'}}></div>
+          <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#E8C872] to-transparent animate-shimmer" style={{animationDelay: '2000ms'}}></div>
         </div>
       </div>
 
@@ -250,30 +303,85 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Custom CSS for animations */}
+      {/* Custom CSS for varied animations */}
       <style jsx global>{`
-        @keyframes symbolFirework {
-          0% {
-            transform: translateY(100vh) scale(0) rotate(0deg);
-            opacity: 0;
-          }
-          20% {
-            transform: translateY(70vh) scale(0.8) rotate(90deg);
-            opacity: 0.4;
-          }
-          40% {
-            transform: translateY(40vh) scale(1) rotate(180deg);
-            opacity: 0.3;
-          }
-          60% {
-            transform: translateY(20vh) scale(0.9) rotate(270deg);
-            opacity: 0.2;
-          }
-          100% {
-            transform: translateY(-100px) scale(0) rotate(360deg);
-            opacity: 0;
-          }
+        /* Float Animations */
+        @keyframes float-up {
+          0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 0; }
+          15% { transform: translateY(70vh) scale(0.8) rotate(90deg); opacity: 0.2; }
+          50% { transform: translateY(30vh) scale(1) rotate(180deg); opacity: 0.15; }
+          85% { transform: translateY(0vh) scale(0.8) rotate(270deg); opacity: 0.1; }
+          100% { transform: translateY(-50px) scale(0) rotate(360deg); opacity: 0; }
         }
+
+        @keyframes float-down {
+          0% { transform: translateY(-100px) scale(0) rotate(0deg); opacity: 0; }
+          15% { transform: translateY(20vh) scale(0.8) rotate(-90deg); opacity: 0.2; }
+          50% { transform: translateY(50vh) scale(1) rotate(-180deg); opacity: 0.15; }
+          85% { transform: translateY(80vh) scale(0.8) rotate(-270deg); opacity: 0.1; }
+          100% { transform: translateY(120vh) scale(0) rotate(-360deg); opacity: 0; }
+        }
+
+        @keyframes float-left {
+          0% { transform: translateX(100vw) scale(0) rotate(0deg); opacity: 0; }
+          15% { transform: translateX(70vw) scale(0.8) rotate(90deg); opacity: 0.2; }
+          50% { transform: translateX(30vw) scale(1) rotate(180deg); opacity: 0.15; }
+          85% { transform: translateX(-10vw) scale(0.8) rotate(270deg); opacity: 0.1; }
+          100% { transform: translateX(-100px) scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes float-right {
+          0% { transform: translateX(-100px) scale(0) rotate(0deg); opacity: 0; }
+          15% { transform: translateX(20vw) scale(0.8) rotate(-90deg); opacity: 0.2; }
+          50% { transform: translateX(50vw) scale(1) rotate(-180deg); opacity: 0.15; }
+          85% { transform: translateX(80vw) scale(0.8) rotate(-270deg); opacity: 0.1; }
+          100% { transform: translateX(120vw) scale(0) rotate(-360deg); opacity: 0; }
+        }
+
+        /* Spin Animations */
+        @keyframes spin-up {
+          0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 0; }
+          20% { transform: translateY(60vh) scale(0.6) rotate(180deg); opacity: 0.2; }
+          80% { transform: translateY(10vh) scale(0.8) rotate(720deg); opacity: 0.1; }
+          100% { transform: translateY(-50px) scale(0) rotate(900deg); opacity: 0; }
+        }
+
+        /* Pulse Animations */
+        @keyframes pulse-up {
+          0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 0; }
+          25% { transform: translateY(60vh) scale(1.2) rotate(45deg); opacity: 0.25; }
+          50% { transform: translateY(40vh) scale(0.8) rotate(90deg); opacity: 0.15; }
+          75% { transform: translateY(20vh) scale(1.1) rotate(135deg); opacity: 0.1; }
+          100% { transform: translateY(-50px) scale(0) rotate(180deg); opacity: 0; }
+        }
+
+        /* Drift Animations */
+        @keyframes drift-up {
+          0% { transform: translate(0, 100vh) scale(0) rotate(0deg); opacity: 0; }
+          20% { transform: translate(20px, 70vh) scale(0.7) rotate(30deg); opacity: 0.2; }
+          50% { transform: translate(-15px, 40vh) scale(1) rotate(60deg); opacity: 0.15; }
+          80% { transform: translate(10px, 10vh) scale(0.8) rotate(90deg); opacity: 0.1; }
+          100% { transform: translate(-20px, -50px) scale(0) rotate(120deg); opacity: 0; }
+        }
+
+        /* Arc Animations */
+        @keyframes arc-up {
+          0% { transform: translate(0, 100vh) scale(0) rotate(0deg); opacity: 0; }
+          25% { transform: translate(50px, 70vh) scale(0.8) rotate(90deg); opacity: 0.2; }
+          50% { transform: translate(-30px, 40vh) scale(1) rotate(180deg); opacity: 0.15; }
+          75% { transform: translate(40px, 10vh) scale(0.7) rotate(270deg); opacity: 0.1; }
+          100% { transform: translate(-50px, -50px) scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        /* Animation classes */
+        .float-up { animation: float-up; }
+        .float-down { animation: float-down; }
+        .float-left { animation: float-left; }
+        .float-right { animation: float-right; }
+        .spin-up { animation: spin-up; }
+        .pulse-up { animation: pulse-up; }
+        .drift-up { animation: drift-up; }
+        .arc-up { animation: arc-up; }
 
         @keyframes gradient {
           0% { background-position: 0% 50%; }
