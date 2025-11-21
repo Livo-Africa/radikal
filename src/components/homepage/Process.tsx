@@ -1,13 +1,13 @@
 // src/components/homepage/Process.tsx - ENHANCED
 'use client';
 import { useState } from 'react';
-import { 
-  Upload, 
-  Sparkles, 
-  MessageCircle, 
-  Target, 
-  Palette, 
-  Cog, 
+import {
+  Upload,
+  Sparkles,
+  MessageCircle,
+  Target,
+  Palette,
+  Cog,
   Rocket,
   Users,
   Building2,
@@ -101,11 +101,10 @@ export default function Process() {
             <div className="grid grid-cols-2 gap-1">
               <button
                 onClick={() => setActiveTab('individuals')}
-                className={`flex items-center justify-center space-x-2 py-3 md:py-4 rounded-xl font-bold text-sm md:text-lg transition-all duration-300 transform ${
-                  activeTab === 'individuals'
+                className={`flex items-center justify-center space-x-2 py-3 md:py-4 rounded-xl font-bold text-sm md:text-lg transition-all duration-300 transform ${activeTab === 'individuals'
                     ? 'bg-[#D4AF37] text-black shadow-lg scale-105'
                     : 'text-gray-600 hover:text-gray-900 hover:scale-102'
-                }`}
+                  }`}
               >
                 <Users className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="hidden sm:inline">For Individuals</span>
@@ -113,11 +112,10 @@ export default function Process() {
               </button>
               <button
                 onClick={() => setActiveTab('business')}
-                className={`flex items-center justify-center space-x-2 py-3 md:py-4 rounded-xl font-bold text-sm md:text-lg transition-all duration-300 transform ${
-                  activeTab === 'business'
+                className={`flex items-center justify-center space-x-2 py-3 md:py-4 rounded-xl font-bold text-sm md:text-lg transition-all duration-300 transform ${activeTab === 'business'
                     ? 'bg-[#D4AF37] text-black shadow-lg scale-105'
                     : 'text-gray-600 hover:text-gray-900 hover:scale-102'
-                }`}
+                  }`}
               >
                 <Building2 className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="hidden sm:inline">For Business</span>
@@ -129,13 +127,12 @@ export default function Process() {
 
         {/* Enhanced Process Steps */}
         <div className="max-w-6xl mx-auto">
-          <div className={`grid gap-4 md:gap-8 ${
-            currentProcess.length === 3 
-              ? 'grid-cols-1 md:grid-cols-3' 
+          <div className={`grid gap-4 md:gap-8 ${currentProcess.length === 3
+              ? 'grid-cols-1 md:grid-cols-3'
               : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
-          }`}>
+            }`}>
             {currentProcess.map((step, index) => (
-              <div 
+              <div
                 key={step.step}
                 className="group text-center relative"
               >
@@ -143,29 +140,29 @@ export default function Process() {
                 {index < currentProcess.length - 1 && (
                   <div className="hidden md:block absolute top-8 left-3/4 w-full h-0.5 bg-gray-300 group-hover:bg-[#D4AF37] transition-colors duration-500 z-0"></div>
                 )}
-                
+
                 {/* Step Card */}
                 <div className="relative z-10 bg-white rounded-2xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-500 transform group-hover:-translate-y-2 border border-gray-100">
                   {/* Step Number */}
                   <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#D4AF37] to-[#F4D03F] rounded-full flex items-center justify-center text-black font-bold text-lg md:text-xl mx-auto mb-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
                     {step.step}
                   </div>
-                  
+
                   {/* Enhanced Icon */}
                   <div className={`w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
                     <step.icon className="w-8 h-8 md:w-10 md:h-10" />
                   </div>
-                  
+
                   {/* Title */}
                   <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-900 group-hover:text-black transition-colors">
                     {step.title}
                   </h3>
-                  
+
                   {/* Description */}
                   <p className="text-gray-600 mb-3 font-semibold text-sm md:text-base">
                     {step.description}
                   </p>
-                  
+
                   {/* Details */}
                   <p className="text-xs md:text-sm text-gray-500 group-hover:text-gray-700 transition-colors leading-relaxed">
                     {step.details}
@@ -189,14 +186,14 @@ export default function Process() {
             <h4 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900 flex items-center justify-center space-x-2">
               <CheckCircle2 className="w-6 h-6 text-[#D4AF37]" />
               <span>
-                {activeTab === 'individuals' 
-                  ? 'No Studio • No Travel • No Awkward Poses' 
+                {activeTab === 'individuals'
+                  ? 'No Studio • No Travel • No Awkward Poses'
                   : 'Quality Assurance • Strategic Oversight • Future-Ready Technology'
                 }
               </span>
             </h4>
             <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-              {activeTab === 'individuals' 
+              {activeTab === 'individuals'
                 ? 'Professional results without the traditional studio hassle. Get perfect photos from the comfort of your home.'
                 : 'Professional creative solutions with transparent communication and cutting-edge technology tailored to your business needs.'
               }
@@ -207,15 +204,16 @@ export default function Process() {
         {/* CTA Section */}
         <div className="text-center mt-8 md:mt-12">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="group bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 justify-center">
-              <span>Start Your {activeTab === 'individuals' ? 'Photoshoot' : 'Project'}</span>
+            <a
+              href={activeTab === 'individuals' ? '/individuals' : '/business'}
+              className="group bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 justify-center"
+            >
+              <span>
+                Start Your {activeTab === 'individuals' ? 'Photoshoot' : 'Project'}
+              </span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <button className="group bg-gray-900 hover:bg-black text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 border border-gray-700 flex items-center space-x-2 justify-center">
-              <span>Learn More</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
+
           </div>
         </div>
 
@@ -230,7 +228,7 @@ export default function Process() {
             <div className="text-xs md:text-sm text-gray-600">Satisfaction</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="text-2xl md:text-3xl font-bold text-[#D4AF37] mb-1">500+</div>
+            <div className="text-2xl md:text-3xl font-bold text-[#D4AF37] mb-1">700+</div>
             <div className="text-xs md:text-sm text-gray-600">Happy Clients</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">

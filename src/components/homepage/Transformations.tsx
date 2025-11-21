@@ -12,7 +12,8 @@ export default function Transformations({ transformations = [] }: { transformati
   const [isPlaying, setIsPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const pathname = usePathname(); // ✅ ADDED THIS LINE
+  const [isTransitioning, setIsTransitioning] = useState(false); // NEW: Track transition state
+  const pathname = usePathname();
 
   // Safe mount detection
   useEffect(() => {
@@ -54,19 +55,26 @@ export default function Transformations({ transformations = [] }: { transformati
         }
       }).filter(t => t.beforeUrl && t.afterUrl);
 
-  // Auto-advance with play/pause control
+  // FIXED: Auto-advance with proper transition handling
   useEffect(() => {
     if (!isMounted || filteredTransformations.length === 0 || !isPlaying) return;
     
     const interval = setInterval(() => {
+      setIsTransitioning(true); // Start transition
+      
       setShowAfter(prev => {
         if (!prev) {
+          // Show after image
           return true;
         } else {
+          // Move to next transformation and show before
           setCurrentIndex((prevIndex) => (prevIndex + 1) % filteredTransformations.length);
           return false;
         }
       });
+
+      // Reset transition state after animation completes
+      setTimeout(() => setIsTransitioning(false), 500);
     }, 4000);
     
     return () => clearInterval(interval);
@@ -80,7 +88,7 @@ export default function Transformations({ transformations = [] }: { transformati
     setIsPlaying(true);
   }, [activeFilter, isMounted]);
 
-  // Touch swipe handlers for mobile
+  // FIXED: Better touch handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -90,30 +98,40 @@ export default function Transformations({ transformations = [] }: { transformati
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStart || !touchEnd || isTransitioning) return;
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
     
     if (isLeftSwipe) {
-      // Swipe left - next transformation
+      setIsTransitioning(true);
       setCurrentIndex((prev) => (prev + 1) % filteredTransformations.length);
       setShowAfter(false);
+      setTimeout(() => setIsTransitioning(false), 500);
     } else if (isRightSwipe) {
-      // Swipe right - previous transformation
+      setIsTransitioning(true);
       setCurrentIndex((prev) => (prev - 1 + filteredTransformations.length) % filteredTransformations.length);
       setShowAfter(false);
+      setTimeout(() => setIsTransitioning(false), 500);
     }
   };
 
+  // FIXED: Toggle view with transition handling
   const handleToggleView = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setShowAfter(!showAfter);
+    setTimeout(() => setIsTransitioning(false), 500);
   };
 
+  // FIXED: Navigation with transition handling
   const handleNavigation = (index: number) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setCurrentIndex(index);
     setShowAfter(false);
+    setTimeout(() => setIsTransitioning(false), 500);
   };
 
   const togglePlayPause = () => {
@@ -127,7 +145,7 @@ export default function Transformations({ transformations = [] }: { transformati
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 font-playfair">
-              The Radikal <span className="text-[#D4AF37]">Transformation</span>
+              The Radikal <span className="text-[#D437]">Transformation</span>
             </h2>
             <p className="text-lg md:text-xl text-[#D4AF37] max-w-2xl mx-auto">
               From ordinary to extraordinary across all services
@@ -228,10 +246,17 @@ export default function Transformations({ transformations = [] }: { transformati
               onTouchEnd={handleTouchEnd}
               onClick={handleToggleView}
             >
+              {/* Loading Overlay during transitions */}
+              {isTransitioning && (
+                <div className="absolute inset-0 bg-black/50 z-20 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]"></div>
+                </div>
+              )}
+
               {/* Before Image */}
               <div className={`absolute inset-0 transition-opacity duration-500 ${
                 showAfter ? 'opacity-0' : 'opacity-100'
-              }`}>
+              } ${isTransitioning ? 'pointer-events-none' : ''}`}>
                 <img 
                   src={currentTransform.beforeUrl} 
                   alt="Before transformation"
@@ -249,7 +274,7 @@ export default function Transformations({ transformations = [] }: { transformati
               {/* After Image */}
               <div className={`absolute inset-0 transition-opacity duration-500 ${
                 showAfter ? 'opacity-100' : 'opacity-0'
-              }`}>
+              } ${isTransitioning ? 'pointer-events-none' : ''}`}>
                 <img 
                   src={currentTransform.afterUrl} 
                   alt="After transformation"
@@ -270,7 +295,7 @@ export default function Transformations({ transformations = [] }: { transformati
                   e.stopPropagation();
                   togglePlayPause();
                 }}
-                className="absolute top-3 md:top-4 right-3 md:right-4 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm"
+                className="absolute top-3 md:top-4 right-3 md:right-4 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm z-30"
               >
                 {isPlaying ? (
                   <Pause className="w-4 h-4 md:w-5 md:h-5" />
@@ -280,7 +305,7 @@ export default function Transformations({ transformations = [] }: { transformati
               </button>
 
               {/* Swipe Hint - Mobile Only */}
-              <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-black/60 text-white px-2 py-1 rounded text-xs md:hidden backdrop-blur-sm">
+              <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-black/60 text-white px-2 py-1 rounded text-xs md:hidden backdrop-blur-sm z-30">
                 ← Swipe →
               </div>
             </div>
@@ -290,7 +315,10 @@ export default function Transformations({ transformations = [] }: { transformati
               {/* Manual Toggle Button */}
               <button
                 onClick={handleToggleView}
-                className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors border border-gray-600 w-full md:w-auto justify-center"
+                disabled={isTransitioning}
+                className={`flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors border border-gray-600 w-full md:w-auto justify-center ${
+                  isTransitioning ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-700'
+                }`}
               >
                 {showAfter ? (
                   <>
@@ -304,35 +332,17 @@ export default function Transformations({ transformations = [] }: { transformati
                   </>
                 )}
               </button>
-
-              {/* Navigation Dots - Enhanced */}
-              <div className="flex space-x-2 md:space-x-3 order-first md:order-none">
-                {filteredTransformations.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleNavigation(index)}
-                    className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
-                      index === currentIndex 
-                        ? 'bg-[#D4AF37] scale-125 shadow-lg shadow-[#D4AF37]/50' 
-                        : 'bg-gray-600 hover:bg-gray-400 hover:scale-110'
-                    }`}
-                    aria-label={`Go to transformation ${index + 1}`}
-                  />
-                ))}
-              </div>
             </div>
 
-            {/* Transformation Info - Enhanced */}
+            {/* SIMPLIFIED Transformation Info - Only Service Type */}
             <div className="text-center bg-gray-900/50 backdrop-blur-sm p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-800 hover:border-gray-600 transition-all duration-500 mb-6 md:mb-8">
               <h4 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">
                 {currentTransform.title}
               </h4>
-              <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm md:text-base">
-                <span className="bg-[#D4AF37] text-black px-3 py-1 md:px-4 md:py-2 rounded-full font-semibold">
+              {/* Only showing service type */}
+              <div className="flex justify-center">
+                <span className="bg-[#D4AF37] text-black px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold text-sm md:text-base">
                   {currentTransform.service}
-                </span>
-                <span className="bg-[#B91C1C] text-white px-3 py-1 md:px-4 md:py-2 rounded-full font-semibold">
-                  {currentTransform.metrics}
                 </span>
               </div>
             </div>
@@ -341,7 +351,7 @@ export default function Transformations({ transformations = [] }: { transformati
             <div className="text-center">
               <a 
                 href="/transformations"
-                className="inline-flex items-center space-x-2 bg-transparent hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black px-6 py-3 rounded-lg font-semibold transition-colors border border-[#D4AF37] text-sm md:text-base"
+                className="inline-flex items-center space-x-2 bg-transparent hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black px-6 py-3 rounded-lg font-semibold transition-colors border border-[#D4AF37] text-sm md:text-base group"
               >
                 <span>View More Work</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

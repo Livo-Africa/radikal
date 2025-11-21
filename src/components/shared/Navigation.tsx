@@ -1,4 +1,4 @@
-// src/components/shared/Navigation.tsx - FIXED VERSION
+// src/components/shared/Navigation.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import { ChevronDown, Sparkles, Building2, Users, Camera, Menu, X } from 'lucide-react';
@@ -8,7 +8,7 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
-  const [mounted, setMounted] = useState(false); // NEW: Track if component is mounted
+  const [mounted, setMounted] = useState(false); //  Track if component is mounted
 
   // Enhanced scroll detection
   useEffect(() => {
@@ -30,25 +30,25 @@ export default function Navigation() {
     individuals: [
       { 
         name: "Studio Shots", 
-        href: "/individuals/studio",
+        href: "/individuals",
         description: "Professional studio-style photography",
         icon: Camera
       },
       { 
         name: "Headshots", 
-        href: "/individuals/headshots",
+        href: "/individuals",
         description: "Corporate and professional headshots",
         icon: Users
       },
       { 
         name: "Occasion & Celebration", 
-        href: "/individuals/occasion",
+        href: "/individuals",
         description: "Special events and celebrations",
         icon: Sparkles
       },
       { 
         name: "Milestone Shots", 
-        href: "/individuals/milestone",
+        href: "/individuals",
         description: "Important life moments captured",
         icon: Camera
       }
@@ -56,25 +56,25 @@ export default function Navigation() {
     business: [
       { 
         name: "Product Shots", 
-        href: "/business/product",
+        href: "/business",
         description: "Professional product photography",
         icon: Camera
       },
       { 
         name: "Brand Identity", 
-        href: "/business/brand",
+        href: "/business",
         description: "Complete brand visual identity",
         icon: Building2
       },
       { 
         name: "Social Media Content", 
-        href: "/business/social",
+        href: "/business",
         description: "Engaging social media visuals",
         icon: Sparkles
       },
       { 
         name: "Marketing Visuals", 
-        href: "/business/marketing",
+        href: "/business",
         description: "Campaign and marketing assets",
         icon: Building2
       }
@@ -82,19 +82,19 @@ export default function Navigation() {
     creators: [
       { 
         name: "Partnership Programs", 
-        href: "/creators/partnership",
+        href: "/creators",
         description: "Collaborative creator programs",
         icon: Users
       },
       { 
         name: "White-label Services", 
-        href: "/creators/white-label",
+        href: "/creators",
         description: "Private label photography services",
         icon: Building2
       },
       { 
         name: "Portfolio Enhancement", 
-        href: "/creators/portfolio",
+        href: "/creators",
         description: "Professional portfolio development",
         icon: Camera
       }
@@ -350,7 +350,7 @@ export default function Navigation() {
             {/* CTA Button with Glass Effect */}
             <div className="hidden lg:flex items-center">
               <a 
-                href="/start" 
+                href="/contact" 
                 className="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 transform hover:scale-105"
                 style={{
                   background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%)',
@@ -457,7 +457,7 @@ export default function Navigation() {
             {/* Mobile CTA */}
             <div className="mt-8 pt-6 border-t border-gray-200/50">
               <a
-                href="/start"
+                href="/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block w-full bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] text-white font-semibold py-4 px-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 text-sm"
                 style={{

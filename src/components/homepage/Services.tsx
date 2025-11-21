@@ -11,7 +11,7 @@ export default function Services() {
       description: "Visual identity that makes your brand unforgettable"
     },
     {
-      title: "Motion & Animation", 
+      title: "Motion & Animation",
       items: ["Promo Videos", "Animations", "Brand Stories"],
       icon: Video,
       gradient: "from-blue-500 to-cyan-500",
@@ -45,11 +45,11 @@ export default function Services() {
             Premium creative solutions powered by cutting-edge technology
           </p>
         </div>
-        
+
         {/* Services Grid - Mobile: 1 column, Tablet: 2 columns, Desktop: 4 columns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {services.map((service, index) => (
-            <div 
+            <div
               key={index}
               className="group relative bg-white rounded-2xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
             >
@@ -59,7 +59,7 @@ export default function Services() {
                   <service.icon className="w-6 h-6 md:w-8 md:h-8" />
                 </div>
               </div>
-              
+
               {/* Title & Description */}
               <h3 className="text-xl md:text-2xl font-bold mb-2 text-gray-900 group-hover:text-black transition-colors">
                 {service.title}
@@ -67,11 +67,11 @@ export default function Services() {
               <p className="text-gray-600 text-sm md:text-base mb-4 md:mb-6 leading-relaxed">
                 {service.description}
               </p>
-              
+
               {/* Enhanced Items List */}
               <ul className="space-y-2 md:space-y-3 mb-6 md:mb-8">
                 {service.items.map((item, idx) => (
-                  <li 
+                  <li
                     key={idx}
                     className="flex items-center text-gray-600 group-hover:text-gray-800 transition-colors transform group-hover:translate-x-1 duration-300"
                     style={{ transitionDelay: `${idx * 100}ms` }}
@@ -81,20 +81,28 @@ export default function Services() {
                   </li>
                 ))}
               </ul>
-              
+
               {/* CTA Button - Hidden on mobile, visible on desktop */}
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden md:block">
-                <button className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition-all duration-300 transform group-hover:scale-105 flex items-center justify-center space-x-2">
+                <a
+                  href="/services"
+                  className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition-all duration-300 transform group-hover:scale-105 flex items-center justify-center space-x-2"
+                >
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </a>
+
               </div>
 
               {/* Mobile CTA - Always visible on mobile */}
-              <button className="w-full md:hidden bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 mt-4">
+              <a
+                href="/services"
+                className="w-full md:hidden bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 mt-4"
+              >
                 <span>Learn More</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </a>
+
             </div>
           ))}
         </div>
@@ -108,10 +116,17 @@ export default function Services() {
             <p className="text-gray-600 mb-4 md:mb-6 max-w-2xl mx-auto">
               Our team can create tailored packages for your specific needs and budget.
             </p>
-            <button className="bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto">
+            <a
+              href="https://wa.me/233207472307?text=Hi%20Radikal,%20I%20want%20a%20custom%20quote%20for%20my%20service"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto"
+            >
               <span>Get Custom Quote</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
+
+
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ export default function Pillars() {
       quote: 'We believe in quality that speaks for itself',
       icon: Crown,
       color: 'from-[#D4AF37] to-[#F4D03F]',
-      cta: 'See Our Work'
+      
     },
     {
       title: 'TECHNOLOGY', 
@@ -18,7 +18,6 @@ export default function Pillars() {
       icon: Cpu,
       color: 'from-blue-500 to-cyan-500',
       
-      cta: 'Explore Technology'
     },
     {
       title: 'FUTURE',
@@ -26,7 +25,6 @@ export default function Pillars() {
       quote: 'We\'re not just keeping up - we\'re paving the way',
       icon: TrendingUp,
       color: 'from-purple-500 to-pink-500',
-      cta: 'Learn More'
     }
   ];
 
@@ -71,10 +69,7 @@ export default function Pillars() {
               </blockquote>
 
               {/* CTA Link */}
-            <a>
-                <span>{pillar.cta}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
+           
             </div>
           ))}
         </div>

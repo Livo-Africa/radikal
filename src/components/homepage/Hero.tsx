@@ -1,7 +1,7 @@
 // src/components/homepage/Hero.tsx - MOBILE FIRST
 'use client';
 import { useState, useEffect } from 'react';
-import { ArrowRight, Play, Sparkles, Zap, Users, Star, ChevronDown } from 'lucide-react';
+import { ArrowRight, Play, Camera, Building, ChevronDown } from 'lucide-react';
 
 export default function Hero() {
   const [currentSubheading, setCurrentSubheading] = useState(0);
@@ -78,44 +78,50 @@ export default function Hero() {
           {/* CTA Buttons - Stacked on Mobile */}
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-8 md:mb-12 px-4">
             {/* Primary CTA - Full width on mobile */}
-            <button className="w-full sm:w-auto group bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-2xl flex items-center justify-center space-x-2">
-              <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+            <a 
+              href="/individuals"
+              className="w-full sm:w-auto group bg-[#D4AF37] hover:bg-[#b8941f] text-black font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-2xl flex items-center justify-center space-x-2"
+            >
+              <Camera className="w-4 h-4 md:w-5 md:h-5" />
               <span>Start Photoshoot</span>
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
             
             {/* Secondary CTA - Less prominent on mobile */}
-            <button className="w-full sm:w-auto group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg transition-all duration-300 transform hover:scale-105 border border-white/30 hover:border-white/50 flex items-center justify-center space-x-2">
-              <Play className="w-4 h-4 md:w-5 md:h-5" />
+            <a 
+              href="/business"
+              className="w-full sm:w-auto group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg transition-all duration-300 transform hover:scale-105 border border-white/30 hover:border-white/50 flex items-center justify-center space-x-2"
+            >
+              <Building className="w-4 h-4 md:w-5 md:h-5" />
               <span>Explore Business Solutions</span>
-            </button>
+            </a>
           </div>
 
-          {/* Social Proof - Simplified on Mobile */}
-          <div className="grid grid-cols-3 gap-4 md:gap-8 max-w-md mx-auto text-white/80 mb-6 md:mb-0">
+          {/* Social Proof - Hidden on mobile, visible on desktop */}
+          <div className="hidden md:grid grid-cols-3 gap-8 max-w-md mx-auto text-white/80 mb-0">
             <div className="flex flex-col items-center">
-              <Zap className="w-4 h-4 md:w-6 md:h-6 text-green-400 mb-1 md:mb-2" />
-              <div className="text-sm md:text-2xl font-bold">1-3h</div>
-              <div className="text-xs md:text-sm">Delivery</div>
+              <Zap className="w-6 h-6 text-green-400 mb-2" />
+              <div className="text-2xl font-bold">1-3h</div>
+              <div className="text-sm">Delivery</div>
             </div>
             <div className="flex flex-col items-center">
-              <Star className="w-4 h-4 md:w-6 md:h-6 text-yellow-400 mb-1 md:mb-2" />
-              <div className="text-sm md:text-2xl font-bold">4.9/5</div>
-              <div className="text-xs md:text-sm">Rating</div>
+              <Star className="w-6 h-6 text-yellow-400 mb-2" />
+              <div className="text-2xl font-bold">4.9/5</div>
+              <div className="text-sm">Rating</div>
             </div>
             <div className="flex flex-col items-center">
-              <Users className="w-4 h-4 md:w-6 md:h-6 text-blue-400 mb-1 md:mb-2" />
-              <div className="text-sm md:text-2xl font-bold">500+</div>
-              <div className="text-xs md:text-sm">Clients</div>
+              <Users className="w-6 h-6 text-blue-400 mb-2" />
+              <div className="text-2xl font-bold">500+</div>
+              <div className="text-sm">Clients</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Scroll Indicator - Hidden on mobile to reduce clutter */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 hidden md:flex animate-bounce">
+      {/* Scroll Indicator - Completely hidden */}
+      {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 hidden md:flex animate-bounce">
         <ChevronDown className="w-6 h-6 text-white/70" />
-      </div>
+      </div> */}
 
       {/* Image Navigation - Minimal on mobile */}
       <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-1 md:space-x-2 z-10">
