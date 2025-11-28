@@ -1,8 +1,9 @@
-// src/components/style-journey/Step6Review.tsx - WITH LUCIDE ICONS
+// src/components/style-journey/Step6Review.tsx - COMPLETE UPDATED FILE
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { useAbandonmentTracking } from '@/hooks/useAbandonmentTracking';
-import { CheckCircle, MessageCircle, FileText, CreditCard, Package, Shirt, Settings, ArrowRight, ArrowLeft, Plus, X, Zap, Shield, Users, Clock } from 'lucide-react';
+import MobileStepHeader from '@/components/mobile/MobileStepHeader';
+import { Check, Edit, MessageCircle, FileText, Package, Shirt, Palette, CreditCard, Shield, Clock, Star, MapPin } from 'lucide-react';
 
 interface Step6ReviewProps {
   formData: any;
@@ -20,14 +21,10 @@ interface AddOn {
 }
 
 export default function Step6Review({ formData, setFormData, currentStep, setCurrentStep }: Step6ReviewProps) {
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [specialRequests, setSpecialRequests] = useState('');
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
-  const [isValidNumber, setIsValidNumber] = useState(false);
-  const [showNextButton, setShowNextButton] = useState(false);
+  const [specialRequests, setSpecialRequests] = useState(formData.specialRequests || '');
+  const [selectedAddOns, setSelectedAddOns] = useState<string[]>(formData.addOns || []);
   const containerRef = useRef<HTMLDivElement>(null);
   const { trackAbandonment, hasPhoneNumber } = useAbandonmentTracking(formData, currentStep);
-  
 
   // Add-ons data
   const addOns: AddOn[] = [
@@ -47,14 +44,6 @@ export default function Step6Review({ formData, setFormData, currentStep, setCur
   }, 0);
   const finalTotal = baseTotal + addOnsTotal;
 
-  // Validate WhatsApp number (Ghana format: +233XXXXXXXXX)
-  useEffect(() => {
-    const ghanaRegex = /^\+233[0-9]{9}$/;
-    const isValid = ghanaRegex.test(whatsappNumber);
-    setIsValidNumber(isValid);
-    setShowNextButton(isValid);
-  }, [whatsappNumber]);
-
   // Handle add-on selection
   const handleAddOnToggle = (addOnId: string) => {
     setSelectedAddOns(prev => 
@@ -65,12 +54,9 @@ export default function Step6Review({ formData, setFormData, currentStep, setCur
   };
 
   const handleContinue = () => {
-    if (!isValidNumber) return;
-    
     // Save all data to form
     setFormData((prev: any) => ({ 
       ...prev, 
-      whatsappNumber,
       specialRequests,
       addOns: selectedAddOns,
       finalTotal
@@ -87,43 +73,20 @@ export default function Step6Review({ formData, setFormData, currentStep, setCur
     }, 200);
   };
 
-const handleBack = () => {
-  // Track abandonment if user has provided phone number
-  if (hasPhoneNumber) {
-    trackAbandonment('navigated_back_from_step_6');
-  }
-  
-  if (containerRef.current) {
-    containerRef.current.style.opacity = '0.9';
-    containerRef.current.style.transform = 'scale(0.98)';
-  }
-  
-  setTimeout(() => {
-    setCurrentStep(5);
-  }, 200);
-};
-
-  // Format phone number as user types
-  const handlePhoneChange = (value: string) => {
-    // Remove all non-digit characters
-    const digits = value.replace(/\D/g, '');
-    
-    // Format based on input
-    let formatted = '';
-    if (digits.startsWith('233')) {
-      formatted = '+' + digits;
-    } else if (digits.startsWith('0')) {
-      formatted = '+233' + digits.slice(1);
-    } else {
-      formatted = '+' + digits;
+  const handleBack = () => {
+    // Track abandonment if user has provided phone number
+    if (hasPhoneNumber) {
+      trackAbandonment('back_button_step_6');
     }
     
-    // Limit to 12 digits after +233
-    if (formatted.length > 13) {
-      formatted = formatted.slice(0, 13);
+    if (containerRef.current) {
+      containerRef.current.style.opacity = '0.9';
+      containerRef.current.style.transform = 'scale(0.98)';
     }
     
-    setWhatsappNumber(formatted);
+    setTimeout(() => {
+      setCurrentStep(5);
+    }, 200);
   };
 
   // Get selected add-ons details
@@ -134,28 +97,36 @@ const handleBack = () => {
   return (
     <div 
       ref={containerRef}
-      className="min-h-[70vh] transition-all duration-300 ease-out"
+      className="min-h-screen lg:min-h-[70vh] transition-all duration-300 ease-out"
     >
-      {/* Header */}
-      <div className="text-center mb-8">
+      {/* Mobile Header */}
+      <MobileStepHeader 
+        title="Review Order"
+        currentStep={currentStep}
+        totalSteps={7}
+        onBack={handleBack}
+      />
+
+      {/* Desktop Header */}
+      <div className="hidden lg:block text-center mb-8 pt-8">
         <div className="flex items-center justify-center space-x-2 mb-4">
-          <CheckCircle className="w-8 h-8 text-[#D4AF37]" />
+          <Check className="w-8 h-8 text-[#D4AF37]" />
           <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] bg-clip-text text-transparent">
             REVIEW YOUR ORDER
           </h1>
         </div>
         <p className="text-gray-600 text-lg">
-          Almost there! Review your photoshoot details and tell us where to send your photos
+          Almost there! Review your photoshoot details
         </p>
       </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-4 lg:px-0">
         {/* Left Column - Order Summary */}
         <div className="space-y-6">
           {/* Order Summary Card */}
           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-              <FileText className="w-6 h-6 text-[#D4AF37]" />
+              <FileText className="w-5 h-5" />
               <span>Order Summary</span>
             </h2>
             
@@ -170,6 +141,7 @@ const handleBack = () => {
                   onClick={() => setCurrentStep(1)}
                   className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold flex items-center space-x-1"
                 >
+                  <Edit className="w-4 h-4" />
                   <span>Edit</span>
                 </button>
               </div>
@@ -177,25 +149,22 @@ const handleBack = () => {
               {/* Package */}
               <div className="flex justify-between items-start">
                 <div>
-                  <div className="font-semibold text-gray-900 flex items-center space-x-2">
-                    <Package className="w-4 h-4" />
-                    <span>Package</span>
-                  </div>
+                  <div className="font-semibold text-gray-900">Package</div>
                   <div className="text-sm text-gray-600">
                     {formData.package?.name} • {formData.package?.photos} photos • {formData.package?.outfits} outfits
                   </div>
-                  <div className="text-sm text-[#D4AF37] font-semibold flex items-center space-x-1">
-                    <Clock className="w-3 h-3" />
-                    <span>Delivery: {formData.package?.deliveryTime}</span>
+                  <div className="text-sm text-[#D4AF37] font-semibold">
+                    Delivery: {formData.package?.deliveryTime}
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-gray-900">₵{formData.package?.price}</div>
                   <button 
                     onClick={() => setCurrentStep(2)}
-                    className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold"
+                    className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold flex items-center space-x-1 justify-end"
                   >
-                    Edit
+                    <Edit className="w-4 h-4" />
+                    <span>Edit</span>
                   </button>
                 </div>
               </div>
@@ -204,10 +173,7 @@ const handleBack = () => {
               {formData.outfits && formData.outfits.length > 0 && (
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-semibold text-gray-900 flex items-center space-x-2">
-                      <Shirt className="w-4 h-4" />
-                      <span>Selected Outfits</span>
-                    </div>
+                    <div className="font-semibold text-gray-900">Selected Outfits</div>
                     <div className="text-sm text-gray-600">
                       {formData.outfits.slice(0, 2).map((outfit: any) => outfit.name).join(', ')}
                       {formData.outfits.length > 2 && ` and ${formData.outfits.length - 2} more`}
@@ -215,9 +181,10 @@ const handleBack = () => {
                   </div>
                   <button 
                     onClick={() => setCurrentStep(4)}
-                    className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold"
+                    className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold flex items-center space-x-1"
                   >
-                    Edit
+                    <Edit className="w-4 h-4" />
+                    <span>Edit</span>
                   </button>
                 </div>
               )}
@@ -226,10 +193,7 @@ const handleBack = () => {
               {formData.style && !formData.style.skipped && (
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-semibold text-gray-900 flex items-center space-x-2">
-                      <Settings className="w-4 h-4" />
-                      <span>Style Preferences</span>
-                    </div>
+                    <div className="font-semibold text-gray-900">Style Preferences</div>
                     <div className="text-sm text-gray-600">
                       {Object.entries(formData.style).map(([key, value]: [string, any]) => (
                         value.selectedOption && (
@@ -242,9 +206,10 @@ const handleBack = () => {
                   </div>
                   <button 
                     onClick={() => setCurrentStep(5)}
-                    className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold"
+                    className="text-[#D4AF37] hover:text-[#b8941f] text-sm font-semibold flex items-center space-x-1"
                   >
-                    Edit
+                    <Edit className="w-4 h-4" />
+                    <span>Edit</span>
                   </button>
                 </div>
               )}
@@ -258,6 +223,55 @@ const handleBack = () => {
               </div>
             </div>
           </div>
+
+          {/* Delivery Information */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+              <MessageCircle className="w-5 h-5 text-green-600" />
+              <span>Delivery Information</span>
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  WhatsApp Number for Delivery
+                </label>
+                <div className="border border-gray-300 rounded-xl p-4 bg-gray-50">
+                  <div className="flex items-center space-x-2 text-lg">
+                    <Check className="w-5 h-5 text-green-600" />
+                    <span className="font-mono">{formData.whatsappNumber}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Your photos will be delivered to this number via WhatsApp
+                  </p>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  To change your number, go back to the photos step
+                </p>
+              </div>
+
+              {/* Special Requests */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Special Requests (Optional)
+                </label>
+                <textarea
+                  value={specialRequests}
+                  onChange={(e) => setSpecialRequests(e.target.value)}
+                  placeholder="Any specific poses, colors, or style preferences? (e.g., 'I prefer natural lighting', 'Please include some smiling shots', 'Focus on my right side')"
+                  className="w-full h-32 border border-gray-300 rounded-xl p-4 text-sm resize-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all"
+                  maxLength={500}
+                />
+                <div className="flex justify-between text-sm text-gray-500 mt-2">
+                  <span className="flex items-center space-x-1">
+                    <FileText className="w-4 h-4" />
+                    <span>Help us understand your vision better</span>
+                  </span>
+                  <span>{specialRequests.length}/500</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Right Column - Add-ons & Final Total */}
@@ -265,7 +279,7 @@ const handleBack = () => {
           {/* Add-ons Card */}
           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-              <Plus className="w-6 h-6 text-[#D4AF37]" />
+              <Package className="w-5 h-5" />
               <span>Enhance Your Photoshoot (Optional)</span>
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -280,21 +294,18 @@ const handleBack = () => {
                   <div
                     key={addOn.id}
                     onClick={() => handleAddOnToggle(addOn.id)}
-                    className={`
-                      border-2 rounded-xl p-4 cursor-pointer transition-all duration-300
-                      ${isSelected
+                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 ${
+                      isSelected
                         ? 'border-[#D4AF37] bg-gradient-to-br from-[#D4AF37]/10 to-transparent'
                         : 'border-gray-200 hover:border-[#D4AF37]/50'
-                      }
-                    `}
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className={`
-                          w-5 h-5 rounded-full border-2 flex items-center justify-center
-                          ${isSelected ? 'bg-[#D4AF37] border-[#D4AF37]' : 'border-gray-300'}
-                        `}>
-                          {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          isSelected ? 'bg-[#D4AF37] border-[#D4AF37]' : 'border-gray-300'
+                        }`}>
+                          {isSelected && <Check className="w-3 h-3 text-white" />}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
@@ -320,7 +331,10 @@ const handleBack = () => {
 
           {/* Final Total Card */}
           <div className="bg-gradient-to-br from-[#D4AF37] to-[#B91C1C] rounded-2xl p-6 text-white">
-            <h2 className="text-xl font-bold mb-4">Final Total</h2>
+            <h2 className="text-xl font-bold mb-4 flex items-center space-x-2">
+              <CreditCard className="w-5 h-5" />
+              <span>Final Total</span>
+            </h2>
             
             <div className="space-y-3">
               {/* Base Package */}
@@ -359,14 +373,14 @@ const handleBack = () => {
               {/* Delivery Info */}
               <div className="bg-white/20 rounded-xl p-3 mt-4">
                 <div className="flex items-center space-x-2 text-sm">
-                  <Zap className="w-4 h-4" />
+                  <Clock className="w-4 h-4" />
                   <span>
                     <strong>Delivery:</strong> {selectedAddOns.includes('rush-delivery') ? '1 HOUR' : formData.package?.deliveryTime} via WhatsApp
                   </span>
                 </div>
                 {selectedAddOns.includes('rush-delivery') && (
                   <div className="text-xs opacity-90 mt-1 flex items-center space-x-1">
-                    <Zap className="w-3 h-3" />
+                    <Clock className="w-3 h-3" />
                     <span>Rush delivery selected - your photos will be prioritized!</span>
                   </div>
                 )}
@@ -376,33 +390,28 @@ const handleBack = () => {
 
           {/* Trust Indicators */}
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-            <h3 className="font-bold text-gray-900 mb-3 text-center">Why Choose Radikal?</h3>
+            <h3 className="font-bold text-gray-900 mb-3 text-center flex items-center justify-center space-x-2">
+              <Shield className="w-5 h-5 text-[#D4AF37]" />
+              <span>Why Choose Radikal?</span>
+            </h3>
             <div className="grid grid-cols-2 gap-4 text-center text-sm">
               <div className="space-y-1">
-                <div className="flex justify-center">
-                  <Zap className="w-6 h-6 text-[#D4AF37]" />
-                </div>
+                <Clock className="w-6 h-6 text-[#D4AF37] mx-auto" />
                 <div className="font-semibold text-gray-900">Fast Delivery</div>
                 <div className="text-gray-600">1-3 hours</div>
               </div>
               <div className="space-y-1">
-                <div className="flex justify-center">
-                  <CheckCircle className="w-6 h-6 text-[#D4AF37]" />
-                </div>
+                <Star className="w-6 h-6 text-[#D4AF37] mx-auto" />
                 <div className="font-semibold text-gray-900">4.9/5 Rating</div>
                 <div className="text-gray-600">500+ clients</div>
               </div>
               <div className="space-y-1">
-                <div className="flex justify-center">
-                  <MessageCircle className="w-6 h-6 text-[#D4AF37]" />
-                </div>
+                <MessageCircle className="w-6 h-6 text-[#D4AF37] mx-auto" />
                 <div className="font-semibold text-gray-900">24/7 Support</div>
                 <div className="text-gray-600">WhatsApp chat</div>
               </div>
               <div className="space-y-1">
-                <div className="flex justify-center">
-                  <Users className="w-6 h-6 text-[#D4AF37]" />
-                </div>
+                <MapPin className="w-6 h-6 text-[#D4AF37] mx-auto" />
                 <div className="font-semibold text-gray-900">Ghana Based</div>
                 <div className="text-gray-600">Local experts</div>
               </div>
@@ -412,44 +421,25 @@ const handleBack = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex space-x-4">
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex space-x-4 px-4 w-full max-w-md lg:max-w-none">
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="
-            bg-gray-600 text-white font-bold py-4 px-6 
-            rounded-2xl shadow-xl 
-            transform transition-all duration-300 
-            hover:scale-105 hover:shadow-2xl
-            active:scale-95
-            flex items-center space-x-2
-          "
+          className="bg-gray-600 text-white font-bold py-4 px-6 rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 flex items-center space-x-2 flex-1 justify-center lg:flex-none"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
+          <span>←</span>
+          <span className="hidden sm:block">Back</span>
         </button>
         
         {/* Next Button */}
-        {showNextButton && (
-          <button
-            onClick={handleContinue}
-            className="
-              bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] 
-              text-white font-bold py-4 px-8 
-              rounded-2xl shadow-2xl 
-              transform transition-all duration-300 
-              hover:scale-105 hover:shadow-3xl
-              active:scale-95
-              flex items-center space-x-3
-            "
-          >
-            <span>Proceed to Payment</span>
-            <ArrowRight className="w-5 h-5 animate-bounce" />
-          </button>
-        )}
+        <button
+          onClick={handleContinue}
+          className="bg-gradient-to-r from-[#D4AF37] to-[#B91C1C] text-white font-bold py-4 px-8 rounded-2xl shadow-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-3xl active:scale-95 flex items-center space-x-3 flex-1 justify-center lg:flex-none"
+        >
+          <span>Proceed to Payment</span>
+          <span className="text-lg animate-bounce">→</span>
+        </button>
       </div>
-
-      
     </div>
   );
 }

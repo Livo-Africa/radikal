@@ -187,24 +187,22 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
     }, 200);
   };
 
-  const handleBack = () => {
-    // Track abandonment if user has provided phone number
-    if (hasPhoneNumber) {
-      trackAbandonment('back_button_step_4');
-    }
-    
-    // Clear temporary wardrobe storage when going back
-    localStorage.removeItem('radikal_selected_outfits');
-    
-    if (containerRef.current) {
-      containerRef.current.style.opacity = '0.9';
-      containerRef.current.style.transform = 'scale(0.98)';
-    }
-    
-    setTimeout(() => {
-      setCurrentStep(3);
-    }, 200);
-  };
+  
+const handleBack = () => {
+  // Only track abandonment if user has provided phone number AND it's not normal flow navigation
+  if (hasPhoneNumber && currentStep > 1) {
+    trackAbandonment('back_button_step_4');
+  }
+  
+  if (containerRef.current) {
+    containerRef.current.style.opacity = '0.9';
+    containerRef.current.style.transform = 'scale(0.98)';
+  }
+  
+  setTimeout(() => {
+    setCurrentStep(3);
+  }, 200);
+};
 
   return (
     <div 

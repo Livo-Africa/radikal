@@ -1,4 +1,4 @@
-// src/components/style-journey/SessionRecovery.tsx - LESS AGGRESSIVE
+// src/components/style-journey/SessionRecovery.tsx - COMPLETE UPDATED FILE
 'use client';
 import { useEffect } from 'react';
 
@@ -11,7 +11,9 @@ interface SessionRecoveryProps {
 
 export default function SessionRecovery({ formData, setFormData, currentStep, setCurrentStep }: SessionRecoveryProps) {
   useEffect(() => {
-    // Check for saved progress on component mount
+    // Only attempt recovery if we're at step 1 (just starting)
+    if (currentStep !== 1) return;
+
     const savedProgress = localStorage.getItem('radikal_booking_progress');
     
     if (savedProgress) {
@@ -21,34 +23,16 @@ export default function SessionRecovery({ formData, setFormData, currentStep, se
         const now = new Date();
         const hoursDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
         
-        // FIXED: Only restore if within 2 hours AND user is at step 1
-        // AND the progress was from a meaningful step (not just started)
-        if (hoursDiff < 2 && currentStep === 1 && progress.currentStep > 2) {
-          console.log('🔄 Session recovery available:', {
-            step: progress.currentStep,
-            shootType: progress.formData.shootTypeName,
-            hoursAgo: hoursDiff
-          });
-          
-          // Only show recovery if user was beyond step 2 (package selection)
-          const shouldRecover = window.confirm(
-            `Continue your ${progress.formData.shootTypeName || 'photoshoot'} from where you left off?`
-          );
-          
-          if (shouldRecover) {
-            setFormData(progress.formData);
-            setCurrentStep(progress.currentStep);
-            console.log('✅ Session recovered:', progress);
-          } else {
-            // Clear saved progress if user doesn't want to recover
-            localStorage.removeItem('radikal_booking_progress');
-            console.log('❌ Session recovery declined');
-          }
-        } else if (hoursDiff >= 2) {
-          // Clear expired progress (older than 2 hours)
+        // Only restore if within 24 hours and progress exists
+        if (hoursDiff < 24 && progress.currentStep > 1) {
+          // SILENT AUTO-RESTORE - No prompt to avoid interrupting flow
+          setFormData(progress.formData);
+          setCurrentStep(progress.currentStep);
+          console.log('🔄 Session auto-recovered to step:', progress.currentStep);
+        } else if (hoursDiff >= 24) {
+          // Clear expired progress
           localStorage.removeItem('radikal_booking_progress');
           localStorage.removeItem('radikal_session_id');
-          console.log('🧹 Cleared expired session progress');
         }
       } catch (error) {
         console.error('Error recovering session:', error);
@@ -56,5 +40,5 @@ export default function SessionRecovery({ formData, setFormData, currentStep, se
     }
   }, [setFormData, setCurrentStep, currentStep]);
 
-  return null; // This component doesn't render anything
+  return null;
 }

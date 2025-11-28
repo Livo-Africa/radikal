@@ -1,7 +1,6 @@
-// src/app/individuals/style-journey/page.tsx - COMPLETE FIXED VERSION
+// In src/app/individuals/style-journey/page.tsx - ADD MobileStepHeader
 'use client';
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import Navigation from '@/components/shared/Navigation';
 import Footer from '@/components/shared/Footer';
 import WhatsAppFloat from '@/components/shared/WhatsAppFloat';
@@ -13,8 +12,9 @@ import Step5StyleCustomization from '@/components/style-journey/Step5StyleCustom
 import Step6Review from '@/components/style-journey/Step6Review';
 import Step7Payment from '@/components/style-journey/Step7Payment';
 import SessionRecovery from '@/components/style-journey/SessionRecovery';
+import MobileStepHeader from '@/components/mobile/MobileStepHeader';
 
-function StyleJourneyContent() {
+export default function StyleJourney() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     shootType: null,
@@ -30,39 +30,6 @@ function StyleJourneyContent() {
     finalTotal: 0
   });
 
-  const searchParams = useSearchParams();
-  
-  // FIXED: Check for step parameter in URL (from wardrobe)
-  useEffect(() => {
-    const stepFromUrl = searchParams.get('step');
-    if (stepFromUrl) {
-      const stepNumber = parseInt(stepFromUrl);
-      if (stepNumber >= 1 && stepNumber <= 7) {
-        console.log('🎯 Setting step from URL:', stepNumber);
-        setCurrentStep(stepNumber);
-        
-        // Load outfits from localStorage if coming from wardrobe
-        if (stepNumber === 4) {
-          const savedOutfits = localStorage.getItem('radikal_selected_outfits');
-          if (savedOutfits) {
-            try {
-              const parsed = JSON.parse(savedOutfits);
-              if (parsed.outfits && Array.isArray(parsed.outfits)) {
-                console.log('👗 Loading outfits from localStorage:', parsed.outfits.length);
-                setFormData(prev => ({
-                  ...prev,
-                  outfits: parsed.outfits
-                }));
-              }
-            } catch (error) {
-              console.error('Error loading saved outfits:', error);
-            }
-          }
-        }
-      }
-    }
-  }, [searchParams]);
-
   const steps = [
     { number: 1, title: 'Shoot Type', component: Step1ShootType },
     { number: 2, title: 'Package', component: Step2Package },
@@ -75,11 +42,22 @@ function StyleJourneyContent() {
 
   const CurrentStepComponent = steps[currentStep - 1]?.component;
 
+  // Step titles for mobile header
+  const stepTitles = [
+    'Choose Shoot Type',
+    'Select Package', 
+    'Upload Photos',
+    'Choose Outfits',
+    'Customize Style',
+    'Review Order',
+    'Complete Payment'
+  ];
+
   return (
     <>
       <Navigation />
       
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-20 pb-32">
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-20 lg:pt-0 pb-32">
         <SessionRecovery 
           formData={formData}
           setFormData={setFormData}
@@ -87,8 +65,17 @@ function StyleJourneyContent() {
           setCurrentStep={setCurrentStep}
         />
         
-        {/* Progress Bar */}
-        <div className="container mx-auto px-4 py-6">
+        {/* Mobile Header - Shows on all steps */}
+        <MobileStepHeader 
+          title={stepTitles[currentStep - 1]}
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          showBack={currentStep > 1}
+          onBack={currentStep > 1 ? () => setCurrentStep(currentStep - 1) : undefined}
+        />
+
+        {/* Progress Bar - Desktop Only */}
+        <div className="hidden lg:block container mx-auto px-4 py-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm font-medium text-gray-700">
@@ -109,7 +96,7 @@ function StyleJourneyContent() {
         </div>
 
         {/* Current Step Content */}
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-0 lg:px-4">
           {CurrentStepComponent && (
             <CurrentStepComponent
               formData={formData}
@@ -124,20 +111,5 @@ function StyleJourneyContent() {
       <Footer />
       <WhatsAppFloat />
     </>
-  );
-}
-
-export default function StyleJourney() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading style journey...</p>
-        </div>
-      </div>
-    }>
-      <StyleJourneyContent />
-    </Suspense>
   );
 }
