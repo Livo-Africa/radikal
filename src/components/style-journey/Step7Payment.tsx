@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 import { CreditCard, Shield, Clock, Check, X, Home, MessageCircle, Loader, ArrowLeft } from 'lucide-react';
+import StickyActionButtons from '../shared/StickyActionButtons';
 
 interface Step7PaymentProps {
   formData: any;
@@ -142,8 +143,15 @@ export default function Step7Payment({ formData, setFormData, currentStep, setCu
   };
 
   const handleNewOrder = () => {
+    // Aggressively clear all session data
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('radikal_booking_progress');
+      localStorage.removeItem('radikal_session_id');
+      localStorage.removeItem('radikal_selected_outfits');
+    }
+
     // Reset form and go back to step 1
-    setFormData({
+    const initialFormData = {
       shootType: null,
       shootTypeName: null,
       package: null,
@@ -155,8 +163,14 @@ export default function Step7Payment({ formData, setFormData, currentStep, setCu
       addOns: [],
       total: 0,
       finalTotal: 0
-    });
+    };
+
+    setFormData(initialFormData);
+    // Force a hard reset of state if possible, but stepping to 1 usually works
     setCurrentStep(1);
+
+    // Safety: Reload page if we think state might stick, but let's try clean state reset first
+    // window.location.reload(); // Optional if state is very sticky
   };
 
   // Payment Processing Screen
@@ -205,6 +219,8 @@ export default function Step7Payment({ formData, setFormData, currentStep, setCu
     if (typeof window !== 'undefined') {
       localStorage.removeItem('radikal_booking_progress');
       localStorage.removeItem('radikal_session_id');
+      localStorage.removeItem('radikal_selected_outfits');
+      // Force a slight delay to ensure UI updates aren't blocked, though unnecessary for sync removeItem
     }
 
     return (
@@ -477,16 +493,15 @@ export default function Step7Payment({ formData, setFormData, currentStep, setCu
         </div>
       </div>
 
-      {/* Navigation Buttons (Mobile Only) */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30 px-4 w-full max-w-md lg:hidden">
-        <button
-          onClick={handleBack}
-          className="bg-gray-600 text-white font-bold py-4 px-6 rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 flex items-center space-x-2 w-full justify-center"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Review</span>
-        </button>
-      </div>
+      {/* Sticky Action Button for Payment */}
+      <StickyActionButtons
+        onBack={handleBack}
+        onNext={handlePayment}
+        nextLabel={`Pay ₵${formData.finalTotal} Now`}
+        showNext={!!selectedMethod}
+        nextIcon={CreditCard}
+        backLabel="Back to Review"
+      />
     </div>
   );
 }

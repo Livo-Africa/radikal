@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 
+// Update interface
 interface StickyActionButtonsProps {
   onNext?: () => void;
   onBack?: () => void;
@@ -10,6 +11,7 @@ interface StickyActionButtonsProps {
   showBack?: boolean;
   isNextDisabled?: boolean;
   isLoading?: boolean;
+  nextIcon?: React.ElementType; // Accept a component reference
   secondaryAction?: {
     label: string;
     onClick: () => void;
@@ -25,6 +27,7 @@ export default function StickyActionButtons({
   showBack = true,
   isNextDisabled = false,
   isLoading = false,
+  nextIcon: NextIcon = ArrowRight, // Default to ArrowRight, allow override
   secondaryAction
 }: StickyActionButtonsProps) {
   return (
@@ -68,7 +71,7 @@ export default function StickyActionButtons({
             ) : (
               <>
                 <span>{nextLabel}</span>
-                <ArrowRight className="w-5 h-5" />
+                <NextIcon className="w-5 h-5" />
               </>
             )}
           </button>

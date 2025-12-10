@@ -30,6 +30,7 @@ export default function SessionRecovery({ formData, setFormData, currentStep, se
           console.log('🧹 Clearing completed/payment-stage session');
           localStorage.removeItem('radikal_booking_progress');
           localStorage.removeItem('radikal_session_id');
+          localStorage.removeItem('radikal_selected_outfits');
           return;
         }
 
@@ -47,6 +48,7 @@ export default function SessionRecovery({ formData, setFormData, currentStep, se
           // Clear expired progress
           localStorage.removeItem('radikal_booking_progress');
           localStorage.removeItem('radikal_session_id');
+          localStorage.removeItem('radikal_selected_outfits');
         }
       } catch (error) {
         console.error('Error recovering session:', error);

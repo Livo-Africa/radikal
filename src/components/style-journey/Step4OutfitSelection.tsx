@@ -42,17 +42,22 @@ export default function Step4OutfitSelection({ formData, setFormData, currentSte
   // Get outfit slots based on package
   const outfitSlots = formData.package?.outfits || 2;
 
-  // Load outfits from localStorage and auto-select browse option
+  // Load outfits from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('radikal_selected_outfits');
+      // Also check if we should be ignoring them based on parent state? 
+      // If formData.outfits is empty but localStorage is not, it might be stale.
+      // But typically we rely on localStorage as the source of truth for this step.
+
+      // However, if the user explicitly cleared session via SessionRecovery, 
+      // then radikal_selected_outfits should be gone too.
+      // Let's ensure we sync:
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (parsed.outfits && Array.isArray(parsed.outfits)) {
             setSelectedOutfits(parsed.outfits);
-
-            // Auto-select browse option if we have outfits
             if (parsed.outfits.length > 0) {
               setSelectedOption('browse');
             }
