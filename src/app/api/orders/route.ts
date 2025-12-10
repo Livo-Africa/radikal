@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
     const orderData = JSON.parse(orderDataString);
     console.log('📦 Received order data:', orderData);
 
-    // Extract files
+    // Extract files (User Photos + Outfit Uploads)
     const files = Array.from(formData.entries())
-      .filter(([key]) => key.startsWith('photo_'))
+      .filter(([key]) => key.startsWith('photo_') || key.startsWith('outfit_upload_'))
       .map(([_, file]) => file as File);
 
     const {
@@ -63,9 +63,9 @@ export async function POST(request: NextRequest) {
     const telegramMessage = formatOrderForTelegram(orderData);
     await sendTelegramMessage(telegramMessage);
 
-    // 2. Send Uploaded Photos to Telegram
+    // 2. Send Uploaded Photos (User Selfies & Uploaded Outfits) to Telegram
     if (files.length > 0) {
-      await sendTelegramMessage(`📸 <b>Reference Photos for Order ${orderId}:</b>`);
+      await sendTelegramMessage(`📸 <b>Reference Photos & Uploads for Order ${orderId}:</b>`);
 
       // Send photos sequentially to maintain order and respect constraints
       for (const file of files) {
@@ -77,13 +77,17 @@ export async function POST(request: NextRequest) {
 
     // 3. Send Wardrobe Selection Images (if from our wardrobe)
     const wardrobeImages = outfits
-      .filter((o: any) => o.imageUrl && o.imageUrl.startsWith('http'))
-      .map((o: any) => o.imageUrl);
+      .filter((o: any) => o.image && o.image.startsWith('http')) // Changed from o.imageUrl which might be wrong based on Outfit interface
+      .map((o: any) => ({ url: o.image, name: o.name }));
 
     if (wardrobeImages.length > 0) {
-      // We can send these as text links or just rely on the summary
-      // For now, let's keep it simple in the summary to avoid spamming 
-      // or we could send a message with links
+      await sendTelegramMessage(`👗 <b>Selected Wardrobe Items for Order ${orderId}:</b>`);
+
+      for (const item of wardrobeImages) {
+        // Send URL directly - Telegram will fetch it
+        await sendTelegramPhoto(item.url, `Selected: ${item.name}`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
 
     // 4. Log to Google Sheets
