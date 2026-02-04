@@ -18,7 +18,7 @@ interface Package {
 
 export default function PackageShowcase() {
   const [showAll, setShowAll] = useState(false);
-  
+
   const allPackages: Package[] = [
     {
       id: "profile-headshots",
@@ -33,7 +33,7 @@ export default function PackageShowcase() {
     },
     {
       id: "solo-standard",
-      name: "Solo Standard", 
+      name: "Solo Standard",
       price: "₵50",
       photos: 4,
       outfits: 1,
@@ -45,7 +45,7 @@ export default function PackageShowcase() {
     {
       id: "birthday-basic",
       name: "Birthday Basic",
-      price: "₵40", 
+      price: "₵40",
       photos: 4,
       outfits: 1,
       deliveryTime: "1-3 hours",
@@ -59,7 +59,7 @@ export default function PackageShowcase() {
       price: "₵70",
       photos: 3,
       outfits: 1,
-      deliveryTime: "1-3 hours", 
+      deliveryTime: "1-3 hours",
       features: ["Graduation theme", "Gown enhancement", "3 photos"],
       popular: true,
       category: "Special Occasions"
@@ -76,7 +76,7 @@ export default function PackageShowcase() {
       category: "Solo"
     },
     {
-      id: "group-standard", 
+      id: "group-standard",
       name: "Group Standard",
       price: "₵80",
       photos: 4,
@@ -100,7 +100,7 @@ export default function PackageShowcase() {
     },
     {
       id: "family-package",
-      name: "Family Package", 
+      name: "Family Package",
       price: "₵150",
       photos: 8,
       outfits: 3,
@@ -115,15 +115,14 @@ export default function PackageShowcase() {
   const hiddenCount = allPackages.length - 6;
 
   const handlePackageSelect = (pkg: Package) => {
-    // Save package to localStorage for preselection
-    const packageData = {
-      package: pkg,
-      selectedAt: new Date().toISOString()
-    };
-    localStorage.setItem('radikal_preselected_package', JSON.stringify(packageData));
-    
-    // Navigate to style journey with package preselected
-    window.location.href = '/individuals/style-journey?step=2';
+    // Determine shootType based on category or ID
+    let shootType = 'profile'; // Default
+    if (pkg.category === 'Solo' || pkg.category === 'Special Occasions') shootType = 'social';
+    if (pkg.category === 'Group') shootType = 'group';
+    if (pkg.id.includes('profile') || pkg.id.includes('headshot')) shootType = 'profile';
+
+    // Navigate to style journey with package preselected and skipping to Step 3
+    window.location.href = `/individuals/style-journey?step=3&packageId=${pkg.id}&shootType=${shootType}`;
   };
 
   return (
@@ -137,7 +136,7 @@ export default function PackageShowcase() {
             Choose from our most popular photoshoot packages
           </p>
         </div>
-        
+
         {/* Packages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {displayedPackages.map((pkg) => (

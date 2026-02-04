@@ -2,91 +2,9 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { Package } from './types';
+import { packagesByType } from '@/data/packages';
 import { Package as PackageIcon, Camera, Shirt, Clock, Check, ArrowRight, ArrowLeft } from 'lucide-react';
 import StickyActionButtons from '../shared/StickyActionButtons';
-
-// Package data based on shoot type
-const packagesByType: Record<string, Package[]> = {
-  profile: [
-    {
-      id: 'basic-profile',
-      name: 'Basic Profile',
-      price: 30,
-      originalPrice: 50,
-      photos: 2,
-      outfits: 1,
-      deliveryTime: '1-3 hours',
-      features: ['Clean professional shots', 'Basic editing', '1 outfit', 'Digital delivery'],
-      popular: false,
-      color: 'from-gray-400 to-gray-600'
-    },
-    {
-      id: 'professional-headshots',
-      name: 'Professional Headshots',
-      price: 50,
-      originalPrice: 80,
-      photos: 3,
-      outfits: 2,
-      deliveryTime: '1-3 hours',
-      features: ['3 professional poses', '2 outfits', 'Enhanced styling', 'Digital delivery'],
-      popular: true,
-      color: 'from-[#D4AF37] to-[#B91C1C]'
-    },
-    {
-      id: 'premium-portfolio',
-      name: 'Premium Portfolio',
-      price: 70,
-      originalPrice: 120,
-      photos: 5,
-      outfits: 3,
-      deliveryTime: '1-2 hours',
-      features: ['5 versatile shots', '3 outfits', 'Premium backgrounds', 'Priority editing'],
-      popular: false,
-      color: 'from-purple-500 to-pink-500'
-    }
-  ],
-  social: [
-    {
-      id: 'social-essential',
-      name: 'Social Essential',
-      price: 40,
-      originalPrice: 60,
-      photos: 5,
-      outfits: 2,
-      deliveryTime: '1-3 hours',
-      features: ['5 social-ready photos', '2 trendy outfits', 'Platform optimization', 'Digital delivery'],
-      popular: true,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      id: 'social-pro',
-      name: 'Social Pro',
-      price: 80,
-      originalPrice: 120,
-      photos: 10,
-      outfits: 3,
-      deliveryTime: '1-2 hours',
-      features: ['10 curated photos', '3 outfits', 'Multiple styles', 'Priority delivery'],
-      popular: false,
-      color: 'from-[#D4AF37] to-[#B91C1C]'
-    }
-  ],
-  // Default fallback
-  default: [
-    {
-      id: 'standard',
-      name: 'Standard Package',
-      price: 50,
-      originalPrice: 80,
-      photos: 5,
-      outfits: 2,
-      deliveryTime: '1-3 hours',
-      features: ['Professional photos', '2 outfits', 'Standard editing', 'Digital delivery'],
-      popular: true,
-      color: 'from-[#D4AF37] to-[#B91C1C]'
-    }
-  ]
-};
 
 interface Step2PackageProps {
   formData: any;

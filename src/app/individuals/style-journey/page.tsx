@@ -85,6 +85,48 @@ function StyleJourneyContent() {
     } else if (stepParam) {
       setCurrentStep(parseInt(stepParam));
     }
+
+    // Case 2: Direct Package Selection from URL
+    const packageId = searchParams.get('packageId');
+    const shootTypeParam = searchParams.get('shootType');
+
+    // Only process if we haven't already loaded data or if we want to force override 
+    // (Checking !formData.package prevents overwrite on re-renders, but we might want to force it if URL exists)
+    // Let's rely on packageId being present.
+    if (packageId && shootTypeParam) {
+      // Lazy import to avoid circular dependency issues if any (though here it's fine)
+      import('@/data/packages').then(({ findPackageById }) => {
+        const selectedPackage = findPackageById(packageId);
+
+        if (selectedPackage) {
+          // Map shootType ID to Name
+          const shootTypeNames: Record<string, string> = {
+            'profile': 'Profile Shoot',
+            'social': 'Social Media',
+            'business': 'Business',
+            'couples': 'Couples',
+            'group': 'Group',
+            'creative': 'Creative'
+          };
+
+          setFormData(prev => ({
+            ...prev,
+            shootType: shootTypeParam,
+            shootTypeName: shootTypeNames[shootTypeParam] || 'Photoshoot',
+            package: selectedPackage,
+            total: selectedPackage.price,
+            finalTotal: selectedPackage.price
+          }));
+
+          // Skip to Step 3 if step param says so, or default to 3
+          if (stepParam) {
+            setCurrentStep(parseInt(stepParam));
+          } else {
+            setCurrentStep(3);
+          }
+        }
+      });
+    }
   }, [searchParams]);
 
   const steps = [
